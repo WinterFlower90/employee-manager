@@ -1,4 +1,4 @@
-package com.pje.basic.model;
+package com.pje.employeemanager.model;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.pje.basic.enums;
+package com.pje.employeemanager.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

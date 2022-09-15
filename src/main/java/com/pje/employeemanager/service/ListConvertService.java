@@ -1,6 +1,6 @@
 package com.pje.employeemanager.service;
 
-import com.pje.basic.model.ListResult;
+import com.pje.employeemanager.model.ListResult;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 

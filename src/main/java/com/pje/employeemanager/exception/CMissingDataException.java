@@ -1,4 +1,4 @@
-package com.pje.basic.exception;
+package com.pje.employeemanager.exception;
 
 public class CMissingDataException extends RuntimeException {
     public CMissingDataException(String msg, Throwable t) {

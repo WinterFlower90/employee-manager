@@ -1,9 +1,9 @@
-package com.pje.basic.service;
+package com.pje.employeemanager.service;
 
-import com.pje.basic.enums.ResultCode;
-import com.pje.basic.model.CommonResult;
-import com.pje.basic.model.ListResult;
-import com.pje.basic.model.SingleResult;
+import com.pje.employeemanager.enums.ResultCode;
+import com.pje.employeemanager.model.CommonResult;
+import com.pje.employeemanager.model.ListResult;
+import com.pje.employeemanager.model.SingleResult;
 import org.springframework.stereotype.Service;
 
 @Service
