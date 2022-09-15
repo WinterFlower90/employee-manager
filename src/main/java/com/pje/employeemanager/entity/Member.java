@@ -4,7 +4,10 @@ import com.pje.employeemanager.enums.Department;
 import com.pje.employeemanager.enums.Gender;
 import com.pje.employeemanager.enums.Position;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
+import com.pje.employeemanager.model.member.MemberDepartmentRequest;
 import com.pje.employeemanager.model.member.MemberJoinRequest;
+import com.pje.employeemanager.model.member.MemberPasswordRequest;
+import com.pje.employeemanager.model.member.MemberPersonalInformationRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,6 +74,39 @@ public class Member {
 
     @Column(nullable = false)
     private LocalDateTime dateUpdate; //수정시간
+
+    /** 사원 비밀번호 변경하기 - 사원. 관리자 가능*/
+    public void putPassword(MemberPasswordRequest passwordRequest) {
+        this.password = passwordRequest.getPassword();
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 사원 부서 및 직급 변경하기 - 관리자 가능 */
+    public void putDepartment(MemberDepartmentRequest departmentRequest) {
+        this.department = departmentRequest.getDepartment();
+        this.position = departmentRequest.getPosition();
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 사원 이름/연락처/프로필사진 변경하기 - 사원. 관리자 가능*/
+    public void putPersonalInfo(MemberPersonalInformationRequest personalInformationRequest) {
+        this.name = personalInformationRequest.getName();
+        this.phone = personalInformationRequest.getPhone();
+        this.profileImageUrl = personalInformationRequest.getProfileImageUrl();
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 관리자-사원 권한 변경하기 - 관리자 가능 */
+    public void putManager() {
+        this.isManager = true;
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 퇴사처리 및 퇴사일자 변경하기 - 관리자 가능*/
+    public void putRetire() {
+        this.isWorking = false;
+        this.dateRetire = LocalDate.now();
+    }
 
     private Member(MemberBuilder builder) {
         this.isManager = builder.isManager;
