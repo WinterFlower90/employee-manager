@@ -1,5 +1,6 @@
 package com.pje.employeemanager.entity;
 
+import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.enums.HolidayType;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
@@ -36,11 +37,27 @@ public class HolidayRegister {
     @Column(nullable = false)
     private LocalDate dateApplication; //신청 일자
 
-    @Column(nullable = false)
-    private Boolean isApproval; //승인 여부 - 기본 false
+    @Column(nullable = false, length = 10)
+    @Enumerated(value = EnumType.STRING)
+    private HolidayStatus holidayStatus; //승인 여부 - 검토중 / 승인 / 반려
 
     @Column(nullable = true)
     private LocalDateTime dateApproval; //승인 시간 (update 개념)
+
+    @Column(nullable = true)
+    private LocalDateTime dateRefusal; //반려 시간 (update 개념)
+
+    public void putHolidayStatus(HolidayStatus holidayStatus) {
+        this.holidayStatus = holidayStatus;
+
+        switch (holidayStatus) {
+            case OK :
+                this.dateApproval = LocalDateTime.now();
+                break;
+            case CANCEL :
+                this.dateRefusal = LocalDateTime.now();
+        }
+    }
 
     private HolidayRegister(HolidayBuilder builder) {
         this.member = builder.member;
@@ -48,7 +65,7 @@ public class HolidayRegister {
         this.reason = builder.reason;
         this.dateDesired = builder.dateDesired;
         this.dateApplication = builder.dateApplication;
-        this.isApproval = builder.isApproval;
+        this.holidayStatus = builder.holidayStatus;
     }
 
     public static class HolidayBuilder implements CommonModelBuilder<HolidayRegister> {
@@ -57,7 +74,7 @@ public class HolidayRegister {
         private final String reason;
         private final LocalDate dateDesired;
         private final LocalDate dateApplication;
-        private final Boolean isApproval;
+        private final HolidayStatus holidayStatus;
 
         public HolidayBuilder(Member member, HolidayApplicationRequest request) {
             this.member = member;
@@ -65,7 +82,7 @@ public class HolidayRegister {
             this.reason = request.getReason();
             this.dateDesired = request.getDateDesired();
             this.dateApplication = LocalDate.now();
-            this.isApproval = false;
+            this.holidayStatus = HolidayStatus.NO_STATUS;
         }
         @Override
         public HolidayRegister build() {

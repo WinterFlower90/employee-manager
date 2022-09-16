@@ -125,7 +125,7 @@ public class WorkService {
         Optional<Work> work = workRepository.findByDateWorkAndMember_Id(LocalDate.now(), member.getId());
 
         if (work.isEmpty()) throw new CNoWorkDataException(); //출근 기록이 없습니다.
-        if (workStatus.equals(WorkStatus.LEAVE_WORK)) throw new CAlreadyWorkOutDataException(); //퇴근후에는 상태를 변경할 수 없습니다.
+        if (work.get().getWorkStatus().equals(WorkStatus.LEAVE_WORK)) throw new CAlreadyWorkOutDataException(); //퇴근후에는 상태를 변경할 수 없습니다.
         if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException(); //근태상태를 다시 출근상태로 변경할 수 없습니다.
         if (workStatus.equals(work.get().getWorkStatus())) throw new CNotChangeSameDataException(); //같은 근태 상태로는 다시 변경할 수 없습니다.
 

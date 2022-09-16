@@ -29,4 +29,5 @@ public class HolidayApplicationRequest {
     @ApiModelProperty(notes = "희망 날짜", required = true)
     @NotNull
     private LocalDate dateDesired;
+
 }

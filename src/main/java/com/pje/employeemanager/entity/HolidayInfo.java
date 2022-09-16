@@ -37,6 +37,8 @@ public class HolidayInfo {
     @Column(nullable = false)
     private LocalDateTime dateUpdate; //수정 일자
 
+
+
     private HolidayInfo(HolidayInfoBuilder builder) {
         this.member = builder.member;
         this.holidayTotal = builder.holidayTotal;
