@@ -7,6 +7,7 @@ import com.pje.employeemanager.exception.CNoMemberDataException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.member.*;
 import com.pje.employeemanager.repository.MemberRepository;
+import com.pje.employeemanager.repository.WorkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final WorkRepository workRepository;
 
     /** 사원 C */
     public void setMember(MemberJoinRequest joinRequest) {

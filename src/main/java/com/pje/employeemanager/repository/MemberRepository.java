@@ -11,5 +11,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAllByIsWorkingOrderByNameAsc(Boolean isWorking);
     List<Member> findAllByIsManagerOrderByIdDesc(Boolean isManager);
     List<Member> findAllByDepartmentOrderByNameAsc(Department department);
+    List<Member> findAllById(Long id);
     List<Member> findByIsManagerAndUserIdAndPassword(Boolean isManager, String userId, String password);
 }

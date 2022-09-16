@@ -2,7 +2,8 @@ package com.pje.employeemanager.entity;
 
 import com.pje.employeemanager.enums.WorkStatus;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
-import com.pje.employeemanager.model.work.AttendanceRequest;
+import com.pje.employeemanager.model.work.WorkStatusRequest;
+import com.pje.employeemanager.model.work.WorkTimeResetRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,6 +49,46 @@ public class Work {
 
     @Column(nullable = false)
     private LocalDateTime dateUpdate; //수정 시간
+
+    /** 퇴근 상태로 변경 */
+    public void putOutWork(Member member, WorkStatusRequest statusRequest) {
+        this.member = member;
+        this.workStatus = statusRequest.getWorkStatus();
+        this.outWork = LocalTime.now();
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 출근 상태로 변경 */
+    public void putInWork(Member member, WorkStatusRequest statusRequest) {
+        this.member = member;
+        this.workStatus = statusRequest.getWorkStatus();
+        this.inWork = LocalTime.now();
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 복귀 상태로 변경 */
+    public void putReturnWork(Member member, WorkStatusRequest statusRequest) {
+        this.member = member;
+        this.workStatus = statusRequest.getWorkStatus();
+        this.returnWork = LocalTime.now();
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 외출 상태로 변경 */
+    public void putPauseWork(Member member, WorkStatusRequest statusRequest) {
+        this.member = member;
+        this.workStatus = statusRequest.getWorkStatus();
+        this.pauseWork = LocalTime.now();
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    /** 출근시간 및 퇴근시간 변경 - 관리자 가능 */
+    public void putWorkTime(Member member, WorkTimeResetRequest resetRequest) {
+        this.member = member;
+        this.inWork = resetRequest.getInWork();
+        this.outWork = resetRequest.getOutWork();
+        this.dateUpdate = LocalDateTime.now();
+    }
 
     private Work(WorkBuilder builder) {
         this.member = builder.member;
