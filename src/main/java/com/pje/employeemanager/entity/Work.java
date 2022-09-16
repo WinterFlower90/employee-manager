@@ -42,6 +42,9 @@ public class Work {
     private LocalTime returnWork; //복귀 시간
 
     @Column(nullable = true)
+    private LocalTime earlyLeaveWork; //조퇴 시간
+
+    @Column(nullable = true)
     private LocalTime outWork; //퇴근 시간
 
     @Column(nullable = false)
@@ -49,6 +52,20 @@ public class Work {
 
     @Column(nullable = false)
     private LocalDateTime dateUpdate; //수정 시간
+
+    /** 조퇴, 퇴근상태로 변경 */
+    public void putStatus(WorkStatus workStatus) {
+        this.workStatus = workStatus;
+
+        switch (workStatus) {
+            case EARLY_LEAVE :
+                this.earlyLeaveWork = LocalTime.now();
+                break;
+            case LEAVE_WORK :
+                this.outWork = LocalTime.now();
+                break;
+        }
+    }
 
     /** 퇴근 상태로 변경 */
     public void putOutWork(Member member, WorkStatusRequest statusRequest) {
@@ -108,13 +125,31 @@ public class Work {
         private LocalDateTime dateCreate;
         private LocalDateTime dateUpdate;
 
-        public WorkBuilder(Member member, WorkStatus workStatus) {
+        /** 출근버튼 누르기 */
+        public WorkBuilder(Member member) {
             this.member = member;
-            this.workStatus = workStatus;
+            this.workStatus = WorkStatus.ATTENDANCE;
             this.dateWork = LocalDate.now();
             this.inWork = LocalTime.now();
             this.dateCreate = LocalDateTime.now();
             this.dateUpdate = LocalDateTime.now();
+        }
+
+        @Override
+        public Work build() {
+            return new Work(this);
+        }
+    }
+
+    private Work(WorkNoneValueBuilder builder) {
+        this.workStatus = builder.workStatus;
+    }
+    public static class WorkNoneValueBuilder implements CommonModelBuilder<Work> {
+        private final WorkStatus workStatus;
+
+        /** 상태없음을 세팅하기 위한 빌더 */
+        public WorkNoneValueBuilder() {
+            this.workStatus = WorkStatus.NO_STATUS;
         }
 
         @Override

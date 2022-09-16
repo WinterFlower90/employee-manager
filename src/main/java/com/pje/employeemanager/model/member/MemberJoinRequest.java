@@ -51,13 +51,13 @@ public class MemberJoinRequest {
     @Enumerated(value = EnumType.STRING)
     private String profileImageUrl; //프로필 사진 url
 
-    @ApiModelProperty(notes = "사원 아이디(~20글자)", required = true)
-    @Length(max = 20)
+    @ApiModelProperty(notes = "사원 아이디(6글자 ~ 20글자)", required = true)
+    @Length(min = 6, max = 20)
     @NotNull
-    private String userId; //사용자 아이디
+    private String username; //사용자 아이디
 
-    @ApiModelProperty(notes = "사원 비밀번호(~10글자)", required = true)
-    @Length(max = 10)
+    @ApiModelProperty(notes = "사원 비밀번호(8글자 ~ 20글자)", required = true)
+    @Length(min = 8, max = 20)
     @NotNull
     private String password; //사용자 비밀번호
 }

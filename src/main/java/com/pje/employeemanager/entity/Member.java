@@ -63,10 +63,10 @@ public class Member {
     @Column(nullable = true)
     private LocalDate dateRetire; //퇴사일
 
-    @Column(nullable = false, length = 20)
-    private String userId; //사용자 아이디
+    @Column(nullable = false, length = 20, unique = true)
+    private String username; //사용자 아이디
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 20)
     private String password; //사용자 비밀번호
 
     @Column(nullable = false)
@@ -119,7 +119,7 @@ public class Member {
         this.position = builder.position;
         this.dateJoin = builder.dateJoin;
         this.isWorking = builder.isWorking;
-        this.userId = builder.userId;
+        this.username = builder.username;
         this.password = builder.password;
         this.dateCreate = builder.dateCreate;
         this.dateUpdate = builder.dateUpdate;
@@ -136,7 +136,7 @@ public class Member {
         private final Position position; //직급
         private final LocalDate dateJoin; //입사일
         private final Boolean isWorking; //재직 여부
-        private final String userId; //사용자 아이디
+        private final String username; //사용자 아이디
         private final String password; //사용자 비밀번호
         private final LocalDateTime dateCreate; //등록시간
         private final LocalDateTime dateUpdate; //수정시간
@@ -152,7 +152,7 @@ public class Member {
             this.position = joinRequest.getPosition();
             this.dateJoin = LocalDate.now();
             this.isWorking = true;
-            this.userId = joinRequest.getUserId();
+            this.username = joinRequest.getUsername();
             this.password = joinRequest.getPassword();
             this.dateCreate = LocalDateTime.now();
             this.dateUpdate = LocalDateTime.now();

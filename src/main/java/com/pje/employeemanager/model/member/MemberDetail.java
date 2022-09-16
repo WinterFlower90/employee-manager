@@ -25,7 +25,7 @@ public class MemberDetail {
 
     private String gender; //성별
 
-    public String userId;
+    public String username;
 
     public String password;
 
@@ -41,7 +41,7 @@ public class MemberDetail {
         this.phone = builder.phone;
         this.birthday = builder.birthday;
         this.gender = builder.gender;
-        this.userId = builder.userId;
+        this.username = builder.username;
         this.password = builder.password;
         this.department = builder.department;
         this.position = builder.position;
@@ -54,7 +54,7 @@ public class MemberDetail {
         private final String phone; //연락처
         private final LocalDate birthday; //생년월일
         private final String gender; //성별
-        public final String userId;
+        public final String username;
         public final String password;
         private final String department; //부서
         private final String position; //직급
@@ -66,7 +66,7 @@ public class MemberDetail {
             this.phone = member.getPhone();
             this.birthday = member.getBirthday();
             this.gender = member.getGender().getName();
-            this.userId = member.getUserId();
+            this.username = member.getUserId();
             this.password = member.getPassword();
             this.department = member.getDepartment().getName();
             this.position = member.getPosition().getName();

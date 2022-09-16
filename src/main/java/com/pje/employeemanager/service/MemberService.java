@@ -4,8 +4,12 @@ import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.enums.Department;
 import com.pje.employeemanager.exception.CMissingDataException;
 import com.pje.employeemanager.exception.CNoMemberDataException;
+import com.pje.employeemanager.exception.CNoWorkingMemberDataException;
+import com.pje.employeemanager.exception.CNotMatchPasswordException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.member.*;
+import com.pje.employeemanager.repository.HolidayInfoRepository;
+import com.pje.employeemanager.repository.HolidayRegisterRepository;
 import com.pje.employeemanager.repository.MemberRepository;
 import com.pje.employeemanager.repository.WorkRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,23 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final WorkRepository workRepository;
+    private final HolidayInfoRepository holidayInfoRepository;
+    private final HolidayRegisterRepository holidayRegisterRepository;
+
+    /** 로그인.
+     *  isManager true = 관리자 로그인, false = 사원 로그인 */
+    public MemberLoginResponse doLogin(Boolean isManager, MemberLoginRequest loginRequest) {
+        Member member = memberRepository.findByUsernameAndIsManager(loginRequest.getUsername(), isManager).orElseThrow(CMissingDataException::new);
+
+        /* 회원정보에 저장된 비밀번호와 사용자가 입력한 비밀번호가 같지 않을때 */
+        if (!member.getPassword().equals(loginRequest.getPassword())) throw new CNotMatchPasswordException();
+
+        /* 회원이 퇴사상태일때 */
+        if (!member.getIsWorking()) throw new CNoWorkingMemberDataException();
+
+        return new MemberLoginResponse.MemberLoginResponseBuilder(member).build();
+    }
+
 
     /** 사원 C */
     public void setMember(MemberJoinRequest joinRequest) {
@@ -123,12 +144,4 @@ public class MemberService {
         member.putRetire();
         memberRepository.save(member);
     }
-
-    /*
-    public MemberDetail loginUserInfo(Member member, Boolean isManager, String userId, String password) {
-        MemberDetail memberDetail = new MemberDetail.MemberDetailBuilder(member).build();
-        memberRepository.findByIsManagerAndUserIdAndPassword(isManager, userId, password);
-        return memberDetail;
-    }
-     */
 }
