@@ -26,7 +26,6 @@ public class WorkService {
     private final WorkRepository workRepository;
     private final MemberRepository memberRepository;
     private final HolidayHistoryRepository holidayInfoRepository;
-    private final HolidayRegisterRepository holidayRegisterRepository;
 
 
     /** 근무 등록하기 - 매일 자동등록 */

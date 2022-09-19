@@ -94,10 +94,16 @@ public class HolidayHistory {
         }
     }
 
-    /** 휴가 승인 상태 변경하기 */
-    public void  putHolidayStatus(HolidayStatusRequest holidayStatusRequest) {
-        this.holidayStatus = holidayStatusRequest.getHolidayStatus();
+    /** 휴가 승인 상태로 변경하기 */
+    public void  putHolidayApproval(HolidayStatus holidayStatus) {
+        this.holidayStatus = HolidayStatus.OK;
         this.dateApproval = LocalDateTime.now();
+    }
+
+    /** 휴가 반려 상태로 변경하기 */
+    public void putHolidayRefusal(HolidayStatus holidayStatus) {
+        this.holidayStatus = HolidayStatus.CANCEL;
+        this.dateRefusal = LocalDateTime.now();
     }
 
     /** 사원이 반차나 연차를 신청 후 관리자가 승인했을때 차감시키기 위한 빌더패턴. */

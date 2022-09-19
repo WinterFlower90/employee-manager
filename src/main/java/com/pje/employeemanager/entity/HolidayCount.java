@@ -60,6 +60,14 @@ public class HolidayCount {
         this.countUse += plusCount;
     }
 
+    public void minusCountTotal(float minusCount) {
+        this.countTotal -= minusCount;
+    }
+
+    public void minusCountUse(float minusCount) {
+        this.countUse -= minusCount;
+    }
+
     private HolidayCount(HolidayCountBuilder builder) {
         this.memberId = builder.memberId;
         this.countTotal = builder.countTotal;
