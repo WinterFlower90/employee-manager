@@ -78,6 +78,7 @@ public class MemberController {
         return ResponseService.getSuccessResult();
     }
 
+    /** 사원 부서 및 직급 수정하기 - 관리자만 가능 */
     @ApiOperation(value = "사원 부서 및 직급 수정하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
@@ -98,6 +99,7 @@ public class MemberController {
         return ResponseService.getSuccessResult();
     }
 
+    /** 사원에게 관리자 권한 부여하기 - 관리자만 가능 */
     @ApiOperation(value = "사원에게 관리자권한 부여하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
@@ -108,6 +110,7 @@ public class MemberController {
         return ResponseService.getSuccessResult();
     }
 
+    /** 사원 퇴사처리 하기 - 관리자만 가능 */
     @ApiOperation(value = "사원을 퇴사처리 하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)

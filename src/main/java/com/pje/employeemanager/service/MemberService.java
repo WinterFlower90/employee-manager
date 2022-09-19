@@ -9,7 +9,6 @@ import com.pje.employeemanager.exception.CNotMatchPasswordException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.member.*;
 import com.pje.employeemanager.repository.HolidayHistoryRepository;
-import com.pje.employeemanager.repository.HolidayRegisterRepository;
 import com.pje.employeemanager.repository.MemberRepository;
 import com.pje.employeemanager.repository.WorkRepository;
 import lombok.RequiredArgsConstructor;

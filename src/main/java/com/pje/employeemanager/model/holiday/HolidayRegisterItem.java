@@ -1,14 +1,12 @@
 package com.pje.employeemanager.model.holiday;
 
-import com.pje.employeemanager.entity.HolidayRegister;
+import com.pje.employeemanager.entity.HolidayHistory;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -16,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HolidayRegisterItem {
     @ApiModelProperty(notes = "휴가 신청 시퀀스")
-    private Long holidayRegisterId; //휴가신청 시퀀스
+    private Long holidayHistoryId; //휴가신청 시퀀스
 
     @ApiModelProperty(notes = "사원 시퀀스")
     private Long memberId; //사원 시퀀스
@@ -43,7 +41,7 @@ public class HolidayRegisterItem {
     private LocalDateTime dateApproval; //승인 시간
 
     private HolidayRegisterItem(HolidayRegisterItemBuilder builder) {
-        this.holidayRegisterId = builder.holidayRegisterId;
+        this.holidayHistoryId = builder.holidayHistoryId;
         this.memberId = builder.memberId;
         this.memberFullName = builder.memberFullName;
         this.holidayType = builder.holidayType;
@@ -55,7 +53,7 @@ public class HolidayRegisterItem {
     }
 
     public static class HolidayRegisterItemBuilder implements CommonModelBuilder<HolidayRegisterItem> {
-        private final Long holidayRegisterId; //휴가신청 시퀀스
+        private final Long holidayHistoryId; //휴가신청 시퀀스
         private final Long memberId; //사원 시퀀스
         private final String memberFullName; // [부서] 사원 이름 + 사원 직급
         private final String holidayType; //휴가 종류 - 연차, 병가 ...
@@ -65,16 +63,16 @@ public class HolidayRegisterItem {
         private final String holidayStatus; //승인 상태
         private final LocalDateTime dateApproval; //승인 시간
 
-        public HolidayRegisterItemBuilder(HolidayRegister holidayRegister) {
-            this.holidayRegisterId = holidayRegister.getId();
-            this.memberId = holidayRegister.getMember().getId();
-            this.memberFullName = "[" + holidayRegister.getMember().getDepartment().getName() + "] " + holidayRegister.getMember().getName() + " " + holidayRegister.getMember().getPosition().getName();
-            this.holidayType = holidayRegister.getHolidayType().getName();
-            this.reason = holidayRegister.getReason();
-            this.dateDesired = holidayRegister.getDateDesired();
-            this.dateApplication = holidayRegister.getDateApplication();
-            this.holidayStatus = holidayRegister.getHolidayStatus().getName();
-            this.dateApproval = holidayRegister.getDateApproval();
+        public HolidayRegisterItemBuilder(HolidayHistory holidayHistory) {
+            this.holidayHistoryId = holidayHistory.getId();
+            this.memberId = holidayHistory.getMember().getId();
+            this.memberFullName = "[" + holidayHistory.getMember().getDepartment().getName() + "] " + holidayHistory.getMember().getName() + " " + holidayHistory.getMember().getPosition().getName();
+            this.holidayType = holidayHistory.getHolidayType().getName();
+            this.reason = holidayHistory.getReason();
+            this.dateDesired = holidayHistory.getDateDesired();
+            this.dateApplication = holidayHistory.getDateApplication();
+            this.holidayStatus = holidayHistory.getHolidayStatus().getName();
+            this.dateApproval = holidayHistory.getDateApproval();
         }
 
         @Override
