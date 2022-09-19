@@ -2,6 +2,7 @@ package com.pje.employeemanager.model.member;
 
 import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,26 +12,37 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberItem {
+    @ApiModelProperty(notes = "사원 시퀀스")
     private Long memberId;
 
+    @ApiModelProperty(notes = "사원 번호")
     private String employeeNumber;
 
+    @ApiModelProperty(notes = "관리자 여부")
     private String isManager;
 
+    @ApiModelProperty(notes = "[부서] 사원 이름 + 사원 직급")
     private String memberFullName;
 
+    @ApiModelProperty(notes = "사원 연락처")
     private String memberPhone;
 
+    @ApiModelProperty(notes = "사원 생년월일")
     private LocalDate birthday;
 
+    @ApiModelProperty(notes = "사원 성별")
     private String gender;
 
+    @ApiModelProperty(notes = "사원 프로필 사진 url")
     private String profileImageUrl; //프로필 사진 url
 
+    @ApiModelProperty(notes = "사원 재직 여부")
     private String isWorking;
 
+    @ApiModelProperty(notes = "사원 입사 일자")
     private LocalDate dateJoin;
 
+    @ApiModelProperty(notes = "사원 퇴사 일자")
     private LocalDate dateRetire;
 
 

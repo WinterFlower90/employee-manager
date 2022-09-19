@@ -4,6 +4,7 @@ import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.enums.HolidayType;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
+import com.pje.employeemanager.model.holiday.HolidayStatusRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,19 +45,25 @@ public class HolidayRegister {
     @Column(nullable = true)
     private LocalDateTime dateApproval; //승인 시간 (update 개념)
 
+    /*
     @Column(nullable = true)
     private LocalDateTime dateRefusal; //반려 시간 (update 개념)
+     */
 
+    /*
     public void putHolidayStatus(HolidayStatus holidayStatus) {
         this.holidayStatus = holidayStatus;
 
         switch (holidayStatus) {
-            case OK :
-                this.dateApproval = LocalDateTime.now();
-                break;
-            case CANCEL :
-                this.dateRefusal = LocalDateTime.now();
+            case OK -> this.dateApproval = LocalDateTime.now();
+            case CANCEL -> this.dateRefusal = LocalDateTime.now();
         }
+    }
+     */
+    /** 휴가 승인 상태 변경하기 */
+    public void  putHolidayStatus(HolidayStatusRequest holidayStatusRequest) {
+        this.holidayStatus = holidayStatusRequest.getHolidayStatus();
+        this.dateApproval = LocalDateTime.now();
     }
 
     private HolidayRegister(HolidayBuilder builder) {
