@@ -23,7 +23,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final WorkRepository workRepository;
     private final HolidayHistoryRepository holidayInfoRepository;
-    private final HolidayRegisterRepository holidayRegisterRepository;
 
     /** 로그인.
      *  isManager true = 관리자 로그인, false = 사원 로그인 */

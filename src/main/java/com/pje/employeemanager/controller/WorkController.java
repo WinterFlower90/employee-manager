@@ -1,9 +1,12 @@
 package com.pje.employeemanager.controller;
 
 import com.pje.employeemanager.entity.Member;
+import com.pje.employeemanager.enums.WorkStatus;
 import com.pje.employeemanager.model.CommonResult;
 import com.pje.employeemanager.model.ListResult;
+import com.pje.employeemanager.model.SingleResult;
 import com.pje.employeemanager.model.work.WorkDetail;
+import com.pje.employeemanager.model.work.WorkStatusResponse;
 import com.pje.employeemanager.service.WorkService;
 import com.pje.employeemanager.service.MemberService;
 import com.pje.employeemanager.service.ResponseService;
@@ -15,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
-@Api(tags = "사원 관리")
+@Api(tags = "근무 관리")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/V1/work")
@@ -45,6 +48,24 @@ public class WorkController {
         return ResponseService.getListResult(workService.getMemberWorkDetails(memberId), true);
     }
 
+    @ApiOperation(value = "나의 근태 상태 가져오기")
+    @GetMapping("/work/member/{memberId}")
+    public SingleResult<WorkStatusResponse> getMyStatus(@PathVariable long memberId) {
+        return ResponseService.getSingleResult(workService.getMyStatus(memberId));
+    }
 
+    @ApiOperation(value = "출근 처리하기")
+    @PostMapping("/company-in")
+    public CommonResult setStatusCompanyIn(Member member) {
+        workService.setStatusCompanyIn(member);
+        return ResponseService.getSuccessResult();
+    }
 
+    /** 수정해야함.. */
+    @ApiOperation(value = "dd")
+    @PutMapping("/")
+    public CommonResult putStatus(WorkStatus workStatus, Member member) {
+        workService.putStatus(workStatus, member);
+        return ResponseService.getSuccessResult();
+    }
 }
