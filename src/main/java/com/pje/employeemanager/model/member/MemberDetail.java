@@ -66,7 +66,7 @@ public class MemberDetail {
             this.phone = member.getPhone();
             this.birthday = member.getBirthday();
             this.gender = member.getGender().getName();
-            this.username = member.getUserId();
+            this.username = member.getUsername();
             this.password = member.getPassword();
             this.department = member.getDepartment().getName();
             this.position = member.getPosition().getName();

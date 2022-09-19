@@ -1,19 +1,18 @@
 package com.pje.employeemanager.entity;
 
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
-import com.pje.employeemanager.model.holiday.HolidayInfoRequest;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class HolidayInfo {
+public class HolidayHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,14 +21,14 @@ public class HolidayInfo {
     @JoinColumn(name = "memberId", nullable = false)
     private Member member;
 
+    /** 연차 갯수를 줄 수도 있기 때문에 증감 여부로 설계 */
+    @ApiModelProperty(notes = "차감여부 (true 차감, false 증가)")
     @Column(nullable = false)
-    private Integer holidayTotal; //총 연차 갯수
+    private Boolean isMinus;
 
+    @ApiModelProperty(notes = "증감값")
     @Column(nullable = false)
-    private Float holidayUse; //사용 연차
-
-    @Column(nullable = false)
-    private Float holidayRemain; //남은 연차 갯수
+    private Float increaseOrDecreaseValue;
 
     @Column(nullable = false)
     private LocalDateTime dateCreate; //생성 일자
@@ -39,35 +38,32 @@ public class HolidayInfo {
 
 
 
-    private HolidayInfo(HolidayInfoBuilder builder) {
+    private HolidayHistory(HolidayInfoBuilder builder) {
         this.member = builder.member;
-        this.holidayTotal = builder.holidayTotal;
-        this.holidayUse = builder.holidayUse;
-        this.holidayRemain = builder.holidayRemain;
+        this.isMinus = builder.isMinus;
+        this.increaseOrDecreaseValue = builder.increaseOrDecreaseValue;
         this.dateCreate = builder.dateCreate;
         this.dateUpdate = builder.dateUpdate;
     }
 
-    public static class HolidayInfoBuilder implements CommonModelBuilder<HolidayInfo> {
+    public static class HolidayInfoBuilder implements CommonModelBuilder<HolidayHistory> {
         private final Member member;
-        private final Integer holidayTotal;
-        private final Float holidayUse;
-        private final Float holidayRemain;
+        private final Boolean isMinus;
+        private final Float increaseOrDecreaseValue;
         private final LocalDateTime dateCreate;
         private final LocalDateTime dateUpdate;
 
-        public HolidayInfoBuilder(Member member, HolidayInfoRequest infoRequest) {
+        public HolidayInfoBuilder(Member member, Boolean isMinus, Float increaseOrDecreaseValue) {
             this.member = member;
-            this.holidayTotal = infoRequest.getHolidayTotal();
-            this.holidayUse = infoRequest.getHolidayUse();
-            this.holidayRemain = infoRequest.getHolidayRemain();
+            this.isMinus = isMinus;
+            this.increaseOrDecreaseValue = increaseOrDecreaseValue;
             this.dateCreate = LocalDateTime.now();
             this.dateUpdate = LocalDateTime.now();
         }
 
         @Override
-        public HolidayInfo build() {
-            return new HolidayInfo(this);
+        public HolidayHistory build() {
+            return new HolidayHistory(this);
         }
     }
 }

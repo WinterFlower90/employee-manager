@@ -9,7 +9,7 @@ import com.pje.employeemanager.model.work.WorkDetail;
 import com.pje.employeemanager.model.work.WorkStatusRequest;
 import com.pje.employeemanager.model.work.WorkStatusResponse;
 import com.pje.employeemanager.model.work.WorkTimeResetRequest;
-import com.pje.employeemanager.repository.HolidayInfoRepository;
+import com.pje.employeemanager.repository.HolidayHistoryRepository;
 import com.pje.employeemanager.repository.HolidayRegisterRepository;
 import com.pje.employeemanager.repository.MemberRepository;
 import com.pje.employeemanager.repository.WorkRepository;
@@ -26,7 +26,7 @@ import java.util.Optional;
 public class WorkService {
     private final WorkRepository workRepository;
     private final MemberRepository memberRepository;
-    private final HolidayInfoRepository holidayInfoRepository;
+    private final HolidayHistoryRepository holidayInfoRepository;
     private final HolidayRegisterRepository holidayRegisterRepository;
 
 

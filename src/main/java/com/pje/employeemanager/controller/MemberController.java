@@ -1,10 +1,12 @@
 package com.pje.employeemanager.controller;
 
+import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.enums.Department;
 import com.pje.employeemanager.model.CommonResult;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.SingleResult;
 import com.pje.employeemanager.model.member.*;
+import com.pje.employeemanager.service.HolidayService;
 import com.pje.employeemanager.service.MemberService;
 import com.pje.employeemanager.service.ResponseService;
 import io.swagger.annotations.Api;
@@ -22,11 +24,14 @@ import javax.validation.Valid;
 @RequestMapping("/V1/member")
 public class MemberController {
     private final MemberService memberService;
+    private final HolidayService holidayService;
 
-    @ApiOperation(value = "사원 정보 등록하기")
+    /** 사원 등록 */
+    @ApiOperation(value = "사원 등록 및 연차 등록하기")
     @PostMapping("/new")
     public CommonResult setMember(@RequestBody @Valid MemberJoinRequest joinRequest) {
-        memberService.setMember(joinRequest);
+        Member member = memberService.setMember(joinRequest); //회원 등록 후
+        holidayService.setHoliday(member.getId(), member.getDateJoin()); //연차 갯수 등록
         return ResponseService.getSuccessResult();
     }
 

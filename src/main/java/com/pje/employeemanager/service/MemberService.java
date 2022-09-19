@@ -8,7 +8,7 @@ import com.pje.employeemanager.exception.CNoWorkingMemberDataException;
 import com.pje.employeemanager.exception.CNotMatchPasswordException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.member.*;
-import com.pje.employeemanager.repository.HolidayInfoRepository;
+import com.pje.employeemanager.repository.HolidayHistoryRepository;
 import com.pje.employeemanager.repository.HolidayRegisterRepository;
 import com.pje.employeemanager.repository.MemberRepository;
 import com.pje.employeemanager.repository.WorkRepository;
@@ -23,7 +23,7 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final WorkRepository workRepository;
-    private final HolidayInfoRepository holidayInfoRepository;
+    private final HolidayHistoryRepository holidayInfoRepository;
     private final HolidayRegisterRepository holidayRegisterRepository;
 
     /** 로그인.
@@ -41,10 +41,10 @@ public class MemberService {
     }
 
 
-    /** 사원 C */
-    public void setMember(MemberJoinRequest joinRequest) {
+    /** 사원 등록 - 저장 후 저장한 결과값을 바로 반환하는것이 포인트 */
+    public Member setMember(MemberJoinRequest joinRequest) {
         Member member = new Member.MemberBuilder(joinRequest).build();
-        memberRepository.save(member);
+        return memberRepository.save(member);
     }
 
     /** 사원 시퀀스 id로 데이터 가져오기 */
