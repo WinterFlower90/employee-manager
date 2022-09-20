@@ -58,8 +58,8 @@ public class HolidayController {
         return ResponseService.getListResult(holidayService.getHolidayRegister(dateStart, dateEnd), true);
     }
 
-    /** 휴가 신청 상태 변경하기 - 관리자용 */
-    @ApiOperation(value = "휴가 신청 상태 변경하기")
+    /** 휴가 승인 상태 변경하기 - 관리자용 */
+    @ApiOperation(value = "휴가 승인 상태 변경하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })

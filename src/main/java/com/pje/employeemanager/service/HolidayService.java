@@ -70,7 +70,8 @@ public class HolidayService {
         HolidayCount holidayCount = holidayCountRepository.findById(member.getId()).orElseThrow(CMissingDataException::new);
 
         if (holidayStatus.equals(HolidayStatus.OK)) {
-            holidayCount.minusCountUse(increaseOrDecreaseValue);
+            holidayCount.minusCountTotal(increaseOrDecreaseValue);
+            holidayCount.plusCountUse(increaseOrDecreaseValue);
             holidayHistory.putHolidayApproval(holidayStatus);
         } else if (holidayStatus.equals(HolidayStatus.CANCEL)) holidayHistory.putHolidayRefusal(holidayStatus);
 
