@@ -5,6 +5,7 @@ import com.pje.employeemanager.enums.Department;
 import com.pje.employeemanager.enums.Gender;
 import com.pje.employeemanager.enums.Position;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,24 +16,34 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberDetail {
 
+    @ApiModelProperty(notes = "사원 번호")
     private String employeeNumber; //사원번호
 
+    @ApiModelProperty(notes = "사원 이름")
     private String name; //이름
 
+    @ApiModelProperty(notes = "사원 연락처")
     private String phone; //연락처
 
+    @ApiModelProperty(notes = "사원 생년월일")
     private LocalDate birthday; //생년월일
 
+    @ApiModelProperty(notes = "사원 성별")
     private String gender; //성별
 
+    @ApiModelProperty(notes = "사원 아이디")
     public String username;
 
+    @ApiModelProperty(notes = "사원 비밀번호")
     public String password;
 
+    @ApiModelProperty(notes = "사원 부서")
     private String department; //부서
 
+    @ApiModelProperty(notes = "사원 직급")
     private String position; //직급
 
+    @ApiModelProperty(notes = "사원 입사일")
     private LocalDate dateJoin; //입사일
 
     private MemberDetail(MemberDetailBuilder builder) {

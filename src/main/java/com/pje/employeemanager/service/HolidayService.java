@@ -8,7 +8,6 @@ import com.pje.employeemanager.exception.CMissingDataException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
 import com.pje.employeemanager.model.holiday.HolidayRegisterItem;
-import com.pje.employeemanager.model.holiday.HolidayStatusRequest;
 import com.pje.employeemanager.repository.HolidayCountRepository;
 import com.pje.employeemanager.repository.HolidayHistoryRepository;
 import lombok.RequiredArgsConstructor;

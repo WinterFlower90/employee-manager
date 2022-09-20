@@ -7,15 +7,19 @@ import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.SingleResult;
 import com.pje.employeemanager.model.work.WorkDetail;
 import com.pje.employeemanager.model.work.WorkStatusResponse;
+import com.pje.employeemanager.model.work.WorkTimeResetRequest;
 import com.pje.employeemanager.service.WorkService;
 import com.pje.employeemanager.service.MemberService;
 import com.pje.employeemanager.service.ResponseService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 
 @Api(tags = "근무 관리")
@@ -36,14 +40,14 @@ public class WorkController {
     @ApiOperation(value = "기간별 출근 내역 리스트 가져오기")
     @GetMapping("/work/search")
     public ListResult<WorkDetail> getWorkDetails(
-            @DateTimeFormat(pattern = "yyyy-MM") @RequestParam(value = "dateStart")LocalDate dateStart,
-            @DateTimeFormat(pattern = "yyyy-MM") @RequestParam(value = "dateEnd")LocalDate dateEnd
+            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateStart")LocalDate dateStart,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateEnd")LocalDate dateEnd
             ) {
         return ResponseService.getListResult(workService.getWorkDetails(dateStart, dateEnd), true);
     }
 
     @ApiOperation(value = "사원별 출근 내역 리스트 가져오기")
-    @GetMapping("/work/member/search")
+    @GetMapping("/work/member/search/{memberId}")
     public ListResult<WorkDetail> getMemberWorkDetails(@PathVariable long memberId) {
         return ResponseService.getListResult(workService.getMemberWorkDetails(memberId), true);
     }
@@ -58,6 +62,16 @@ public class WorkController {
     @PostMapping("/company-in")
     public CommonResult setStatusCompanyIn(Member member) {
         workService.setStatusCompanyIn(member);
+        return ResponseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "출근 시간 변경하기")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "workId", value = "근무 시퀀스", required = true)
+    })
+    @PutMapping("/time-reset/{workId}")
+    public CommonResult putWorkTime(Member member, @PathVariable long workId, @RequestBody @Valid WorkTimeResetRequest resetRequest) {
+        workService.putWorkTime(workId, member, resetRequest);
         return ResponseService.getSuccessResult();
     }
 

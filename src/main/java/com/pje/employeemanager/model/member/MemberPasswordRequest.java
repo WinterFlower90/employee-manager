@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class MemberPasswordRequest {
-    @ApiModelProperty(notes = "사원 비밀번호(~10글자)", required = true)
-    @Length(max = 10)
+    @ApiModelProperty(notes = "사원 비밀번호(~20글자)", required = true)
+    @Length(max = 20)
     @NotNull
     private String password; //사용자 비밀번호
 }

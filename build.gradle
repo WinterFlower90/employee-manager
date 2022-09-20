@@ -30,6 +30,8 @@ dependencies {
 
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
     implementation 'io.springfox:springfox-swagger2:2.9.2'
+
+    implementation 'org.apache.commons:commons-lang3:3.12.0' // 문자열을 더 효율적으로 검사하고 사용하기 위한 패키지
 }
 
 tasks.named('test') {
