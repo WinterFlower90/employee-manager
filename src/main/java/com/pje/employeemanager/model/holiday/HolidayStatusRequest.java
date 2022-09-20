@@ -14,4 +14,7 @@ public class HolidayStatusRequest {
     @ApiModelProperty(notes = "휴가 승인 상태", required = true)
     @Enumerated(value = EnumType.STRING)
     private HolidayStatus holidayStatus;
+
+    @ApiModelProperty(notes = "휴가 차감 값", required = true)
+    private float increaseOrDecreaseValue;
 }

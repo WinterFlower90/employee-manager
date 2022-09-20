@@ -1,11 +1,14 @@
 package com.pje.employeemanager.controller;
 
+import com.pje.employeemanager.entity.HolidayHistory;
 import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.model.CommonResult;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
+import com.pje.employeemanager.model.holiday.HolidayCountRequest;
 import com.pje.employeemanager.model.holiday.HolidayRegisterItem;
+import com.pje.employeemanager.model.holiday.HolidayStatusRequest;
 import com.pje.employeemanager.model.work.WorkDetail;
 import com.pje.employeemanager.service.HolidayService;
 import com.pje.employeemanager.service.MemberService;
@@ -42,7 +45,7 @@ public class HolidayController {
 
     /** 휴가 신청하기 - 사원용 */
     @ApiOperation(value = "휴가 신청하기")
-    @PostMapping("/new/holiday")
+    @PostMapping("/new/my-holiday")
     public CommonResult setHolidayRegister(Member member, @RequestBody @Valid HolidayApplicationRequest applicationRequest) {
         holidayService.setHolidayRegister(member, applicationRequest);
         return ResponseService.getSuccessResult();
@@ -61,13 +64,13 @@ public class HolidayController {
     /** 휴가 승인 상태 변경하기 - 관리자용 */
     @ApiOperation(value = "휴가 승인 상태 변경하기")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
+            @ApiImplicitParam(name = "holidayHistoryId", value = "휴가 기록 시퀀스", required = true)
     })
-    @PutMapping("/holiday/register/manager/{memberId}")
-    public CommonResult putHolidayStatus(@PathVariable long memberId, HolidayStatus holidayStatus, float increaseOrDecreaseValue) {
-        Member member = memberService.getMemberData(memberId);
-        holidayService.putHolidayStatus(member, holidayStatus, increaseOrDecreaseValue);
+    @PutMapping("/holiday/register/manager/{holidayHistoryId}")
+    public CommonResult putHolidayStatus(@PathVariable long holidayHistoryId, @RequestBody @Valid HolidayStatusRequest holidayStatusRequest) {
+        holidayService.putHolidayStatus(holidayHistoryId, holidayStatusRequest);
         return ResponseService.getSuccessResult();
+
     }
 
     /** 사원 연차 갯수 변경하기(증감) - 관리자용 */
@@ -76,9 +79,9 @@ public class HolidayController {
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
     @PutMapping("/holiday/manager/{memberId}")
-    public CommonResult putHolidayCount(@PathVariable long memberId, boolean isMinus, float increaseOrDecreaseValue) {
+    public CommonResult putHolidayCount(@PathVariable long memberId, @RequestBody @Valid HolidayCountRequest holidayCountRequest) {
         Member member = memberService.getMemberData(memberId);
-        holidayService.putHolidayCount(member, isMinus, increaseOrDecreaseValue);
+        holidayService.putHolidayCount(member, holidayCountRequest);
         return ResponseService.getSuccessResult();
     }
 

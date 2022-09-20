@@ -4,10 +4,13 @@ import com.pje.employeemanager.entity.HolidayCount;
 import com.pje.employeemanager.entity.HolidayHistory;
 import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.enums.HolidayStatus;
+import com.pje.employeemanager.enums.HolidayType;
 import com.pje.employeemanager.exception.CMissingDataException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
+import com.pje.employeemanager.model.holiday.HolidayCountRequest;
 import com.pje.employeemanager.model.holiday.HolidayRegisterItem;
+import com.pje.employeemanager.model.holiday.HolidayStatusRequest;
 import com.pje.employeemanager.repository.HolidayCountRepository;
 import com.pje.employeemanager.repository.HolidayHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,15 +33,15 @@ public class HolidayService {
     }
 
     /** 연차 증감 - 관리자용 */
-    public void putHolidayCount(Member member, boolean isMinus, float increaseOrDecreaseValue) {
+    public void putHolidayCount(Member member, HolidayCountRequest holidayCountRequest) {
         HolidayCount holidayCount = holidayCountRepository.findById(member.getId()).orElseThrow(CMissingDataException::new);
 
-        if (isMinus) holidayCount.plusCountUse(increaseOrDecreaseValue); //얀차 차감(사용)이라면 사용 연차 갯수를 늘려주고
-        else holidayCount.plusCountTotal(increaseOrDecreaseValue); //연차 증가(추가부여)라면 총 연차 갯수를 늘려준다.
+        if (holidayCountRequest.isMinus()) holidayCount.plusCountUse(holidayCountRequest.getIncreaseOrDecreaseValue()); //얀차 차감(사용)이라면 사용 연차 갯수를 늘려주고
+        else holidayCount.plusCountTotal(holidayCountRequest.getIncreaseOrDecreaseValue()); //연차 증가(추가부여)라면 총 연차 갯수를 늘려준다.
         holidayCountRepository.save(holidayCount);
 
         /* 연차 변경 내역 등록 */
-        HolidayHistory holidayHistory = new HolidayHistory.HolidayHistoryBuilder(member, isMinus, increaseOrDecreaseValue).build();
+        HolidayHistory holidayHistory = new HolidayHistory.HolidayHistoryBuilder(member, holidayCountRequest).build();
         holidayHistoryRepository.save(holidayHistory);
     }
 
@@ -65,17 +68,20 @@ public class HolidayService {
     }
 
     /** U : 휴가 승인상태 변경하기 - 관리자 가능 */
-    public void putHolidayStatus(Member member, HolidayStatus holidayStatus, float increaseOrDecreaseValue) {
-        HolidayHistory holidayHistory = holidayHistoryRepository.findById(member.getId()).orElseThrow(CMissingDataException::new);
-        HolidayCount holidayCount = holidayCountRepository.findById(member.getId()).orElseThrow(CMissingDataException::new);
+    public void putHolidayStatus(long holidayHistoryId, HolidayStatusRequest holidayStatusRequest) {
+        HolidayHistory holidayHistory = holidayHistoryRepository.findById(holidayHistoryId).orElseThrow(CMissingDataException::new);
 
-        if (holidayStatus.equals(HolidayStatus.OK)) {
-            holidayCount.minusCountTotal(increaseOrDecreaseValue);
-            holidayCount.plusCountUse(increaseOrDecreaseValue);
-            holidayHistory.putHolidayApproval(holidayStatus);
-        } else if (holidayStatus.equals(HolidayStatus.CANCEL)) holidayHistory.putHolidayRefusal(holidayStatus);
+        if (holidayStatusRequest.getHolidayStatus().equals(HolidayStatus.OK)) {
+            HolidayCount holidayCount = holidayCountRepository.findTopByMemberIdOrderByDateHolidayCountStartDesc(holidayHistory.getMember().getId()).orElseThrow(CMissingDataException::new);
+
+            float plusValue = holidayHistory.getHolidayType() == HolidayType.ANNUAL ? 1f : 0.5f;
+
+            holidayCount.putCountUse(plusValue);
+            holidayCountRepository.save(holidayCount);
+            holidayHistory.putIsHolidayApproval(holidayStatusRequest.getHolidayStatus());
+
+        } else if (holidayStatusRequest.getHolidayStatus().equals(HolidayStatus.CANCEL)) holidayHistory.putHolidayRefusal(holidayStatusRequest.getHolidayStatus());
 
         holidayHistoryRepository.save(holidayHistory);
-        holidayCountRepository.save(holidayCount);
     }
 }

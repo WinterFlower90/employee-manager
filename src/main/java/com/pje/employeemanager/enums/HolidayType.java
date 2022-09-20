@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum HolidayType {
     ANNUAL ("연차"),
+    HALF_ANNUAL ("반차"),
     SICK ("병가")
     ;
 

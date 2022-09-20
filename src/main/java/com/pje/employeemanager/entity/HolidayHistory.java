@@ -4,6 +4,7 @@ import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.enums.HolidayType;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
+import com.pje.employeemanager.model.holiday.HolidayCountRequest;
 import com.pje.employeemanager.model.holiday.HolidayStatusRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -80,10 +81,10 @@ public class HolidayHistory {
         private final LocalDateTime dateCreate;
         private final LocalDateTime dateUpdate;
 
-        public HolidayHistoryBuilder(Member member, Boolean isMinus, Float increaseOrDecreaseValue) {
+        public HolidayHistoryBuilder(Member member, HolidayCountRequest holidayCountRequest) {
             this.member = member;
-            this.isMinus = isMinus;
-            this.increaseOrDecreaseValue = increaseOrDecreaseValue;
+            this.isMinus = holidayCountRequest.isMinus();
+            this.increaseOrDecreaseValue = holidayCountRequest.getIncreaseOrDecreaseValue();
             this.dateCreate = LocalDateTime.now();
             this.dateUpdate = LocalDateTime.now();
         }
@@ -104,6 +105,16 @@ public class HolidayHistory {
     public void putHolidayRefusal(HolidayStatus holidayStatus) {
         this.holidayStatus = HolidayStatus.CANCEL;
         this.dateRefusal = LocalDateTime.now();
+    }
+
+    public void putIsHolidayApproval(HolidayStatus holidayStatus) {
+        this.holidayStatus = holidayStatus;
+
+        if (holidayStatus.equals(HolidayStatus.OK)) {
+            this.dateApproval = LocalDateTime.now();
+        } else if (holidayStatus.equals(HolidayStatus.CANCEL)) {
+            this.dateRefusal = LocalDateTime.now();
+        }
     }
 
     /** 사원이 반차나 연차를 신청 후 관리자가 승인했을때 차감시키기 위한 빌더패턴. */

@@ -26,7 +26,7 @@ public class MemberController {
     private final MemberService memberService;
     private final HolidayService holidayService;
 
-    /** 사원 등록 */
+    /** 사원 등록 - 관리자용*/
     @ApiOperation(value = "사원 등록 및 연차 등록하기")
     @PostMapping("/new")
     public CommonResult setMember(@RequestBody @Valid MemberJoinRequest joinRequest) {
@@ -37,7 +37,7 @@ public class MemberController {
 
     /** 사원, 관리자 조회가능 */
     @ApiOperation(value = "사원 리스트 가져오기")
-    @GetMapping("/search")
+    @GetMapping("get/list/search")
     public ListResult<MemberItem> getMembers(
             @RequestParam(value = "isWorking", required = false) Boolean isWorking,
             @RequestParam(value = "department", required = false) Department department) {
@@ -63,7 +63,7 @@ public class MemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @GetMapping("/{memberId}")
+    @GetMapping("/get/list/{memberId}")
     public SingleResult<MemberItem> getMember(@PathVariable long memberId) {
         return ResponseService.getSingleResult(memberService.getMember(memberId));
     }
@@ -72,7 +72,7 @@ public class MemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @PutMapping("/put-password/{memberId}")
+    @PutMapping("/my/password/{memberId}")
     public CommonResult putPassword(@PathVariable long memberId, @RequestBody @Valid MemberPasswordRequest passwordRequest) {
         memberService.putPassword(memberId, passwordRequest);
         return ResponseService.getSuccessResult();
@@ -93,7 +93,7 @@ public class MemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @PutMapping("/put-personal/{memberId}")
+    @PutMapping("/my/personal/{memberId}")
     public CommonResult putPersonalInfo(@PathVariable long memberId, @RequestBody @Valid MemberPersonalInformationRequest request) {
         memberService.putPersonalInfo(memberId, request);
         return ResponseService.getSuccessResult();

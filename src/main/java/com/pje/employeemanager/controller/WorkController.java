@@ -53,7 +53,7 @@ public class WorkController {
     }
 
     @ApiOperation(value = "나의 근태 상태 가져오기")
-    @GetMapping("/work/member/{memberId}")
+    @GetMapping("/my/status/{memberId}")
     public SingleResult<WorkStatusResponse> getMyStatus(@PathVariable long memberId) {
         return ResponseService.getSingleResult(workService.getMyStatus(memberId));
     }
@@ -75,10 +75,15 @@ public class WorkController {
         return ResponseService.getSuccessResult();
     }
 
-    /** 수정해야함.. */
-    @ApiOperation(value = "dd")
-    @PutMapping("/")
-    public CommonResult putStatus(WorkStatus workStatus, Member member) {
+    /** 나의 근태상태 수정하기 - 사원용 */
+    @ApiOperation(value = "나의 근태상태 수정하기")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "workId", value = "근무 시퀀스", required = true),
+            @ApiImplicitParam(name = "workStatus", value = "근무 상태", required = true)
+    })
+    @PutMapping("/my/{memberId}/status/{workStatus}")
+    public CommonResult putStatus(@PathVariable long memberId, @PathVariable WorkStatus workStatus) {
+        Member member = memberService.getMemberData(memberId);
         workService.putStatus(workStatus, member);
         return ResponseService.getSuccessResult();
     }

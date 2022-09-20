@@ -52,6 +52,21 @@ public class HolidayCount {
     @Column(nullable = false)
     private LocalDateTime dateUpdate;
 
+    /** 남은 연차 보여주기 */
+    public Float getHolidayRemain() {
+        return this.countTotal - this.countUse;
+    }
+
+    public void putCountUse(float plusValue) {
+        this.countUse += plusValue;
+        this.dateUpdate = LocalDateTime.now();
+    }
+
+    public void putCountTotal(float plusValue) {
+        this.countTotal += plusValue;
+        this.dateUpdate = LocalDateTime.now();
+    }
+
     public void plusCountTotal(float plusCount) {
         this.countTotal += plusCount;
     }
