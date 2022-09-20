@@ -41,6 +41,7 @@ public class WorkService {
         workRepository.save(work);
     }
 
+
     /** 출근 처리하기 - 상태없음일때만 노출 */
     public void putInWork(long workId, Member member, WorkStatusRequest statusRequest) {
         Work work = workRepository.findById(workId).orElseThrow(CMissingDataException::new);
@@ -68,6 +69,7 @@ public class WorkService {
         work.putOutWork(member, statusRequest);
         workRepository.save(work);
     }
+
 
     /** 일자별 근무리스트 가져오기 */
     public ListResult<WorkDetail> getWorkDetails(LocalDate dateStart, LocalDate dateEnd) {
