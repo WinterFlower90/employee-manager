@@ -33,8 +33,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final WorkRepository workRepository;
-    private final HolidayHistoryRepository holidayInfoRepository;
 
     /** 데이터를 수동으로 조회하기 위해 필요함.
      * 복잡한 검색 필터를 구현하기 위해 필요 (레포지토리에 쿼리문 입력시 한계가 있음) */
@@ -192,6 +190,8 @@ public class MemberService {
         Root<Member> root = criteriaQuery.from(Member.class); //대장 엔티티 설정
 
         List<Predicate> predicates = new LinkedList<>(); //검색 조건을 넣을 리스트를 생성함
+        //StringUtils.length를 쓰는 이유 : String에 length를 쓰게 되면 null값인 경우 에러. (nullpoint exception)
+        //common-lang3 패키지의 경우 StringUtils.length를 쓰게 되면 null값을 넣어도 에러를 뱉지 않고 숫자 0을 줌.
 
         //만약 검색필터에서 아이디 검색하기를 원한다면 (글자수가 0글자 초과일 경우) root entity (위에서 member라고 지정) username 필드에서 해당 단어를 포함하는 (like) 조건을 추가
         if (StringUtils.length(searchRequest.getUsername()) > 0) predicates.add(criteriaBuilder.like(root.get("username"), "%" + searchRequest.getUsername() + "%"));
@@ -208,7 +208,7 @@ public class MemberService {
         if (searchRequest.getIsWorking() != null) predicates.add(criteriaBuilder.equal(root.get("isWorking"), searchRequest.getIsWorking()));
         if (searchRequest.getIsManager() != null) predicates.add(criteriaBuilder.equal(root.get("isManager"), searchRequest.getIsManager()));
         if (searchRequest.getDateJoinStart() != null) predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dateJoin"), searchRequest.getDateJoinStart()));
-        if (searchRequest.getDateJoinEnd() != null) predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dateEnd"), searchRequest.getDateJoinEnd()));
+        if (searchRequest.getDateJoinEnd() != null) predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dateJoin"), searchRequest.getDateJoinEnd()));
         //실제로는 여기까지 기재된 검색 조건들만 잘 기재하면 된다
 
         Predicate[] predArray = new Predicate[predicates.size()]; //총 where 조건의 갯수를 구함

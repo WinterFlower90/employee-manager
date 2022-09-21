@@ -5,9 +5,7 @@ import com.pje.employeemanager.enums.WorkStatus;
 import com.pje.employeemanager.model.CommonResult;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.SingleResult;
-import com.pje.employeemanager.model.work.WorkDetail;
-import com.pje.employeemanager.model.work.WorkStatusResponse;
-import com.pje.employeemanager.model.work.WorkTimeResetRequest;
+import com.pje.employeemanager.model.work.*;
 import com.pje.employeemanager.service.WorkService;
 import com.pje.employeemanager.service.MemberService;
 import com.pje.employeemanager.service.ResponseService;
@@ -86,5 +84,12 @@ public class WorkController {
         Member member = memberService.getMemberData(memberId);
         workService.putStatus(workStatus, member);
         return ResponseService.getSuccessResult();
+    }
+
+    /** 관리자용 근무 리스트 가져오기 (필터기능 o) */
+    @ApiOperation(value = "관리자용 근무 리스트 가져오기")
+    @PostMapping("/works/page/{pageNum}")
+    public ListResult<WorkAdminListItem> getWorkListByAdmin(@PathVariable int pageNum, @RequestBody @Valid WorkSearchRequest workSearchRequest) {
+        return ResponseService.getListResult(workService.getList(pageNum, workSearchRequest), true);
     }
 }

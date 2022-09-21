@@ -23,6 +23,7 @@ public class HolidayApplicationRequest {
     private HolidayType holidayType;
 
     @ApiModelProperty(notes = "휴가 사유", required = true)
+    @Length(min = 2)
     @NotNull
     private String reason;
 

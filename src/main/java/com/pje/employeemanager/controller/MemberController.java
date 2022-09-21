@@ -124,6 +124,7 @@ public class MemberController {
     /** 회원 리스트 - 관리자용
      * post 구현한 이유는 검색필터 부분을 body로 쓰기 위함. (간단하게 구현하기 위해)
      * get 구현하려면 검색필터의 모든 조건들을 requestParam 으로 다 기재해주어야 함 */
+    @ApiOperation(value = "관리자용 회원 리스트 가져오기")
     @PostMapping("/members/page/{pageNum}")
     public ListResult<MemberAdminListItem> getMemberListByAdmin(@PathVariable int pageNum, @RequestBody @Valid MemberSearchRequest memberSearchRequest) {
         return ResponseService.getListResult(memberService.getList(pageNum, memberSearchRequest), true);

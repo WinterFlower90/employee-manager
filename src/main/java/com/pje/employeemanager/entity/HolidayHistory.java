@@ -44,7 +44,7 @@ public class HolidayHistory {
 
     @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)
-    private HolidayType holidayType; //휴가 타입 : 연차, 병가 ...
+    private HolidayType holidayType; //휴가 타입 : 연차, 반차, 병가 ...
 
     @Column(nullable = false)
     private String reason; //사유

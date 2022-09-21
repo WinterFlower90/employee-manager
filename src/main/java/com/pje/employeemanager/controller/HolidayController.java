@@ -5,11 +5,10 @@ import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.model.CommonResult;
 import com.pje.employeemanager.model.ListResult;
-import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
-import com.pje.employeemanager.model.holiday.HolidayCountRequest;
-import com.pje.employeemanager.model.holiday.HolidayRegisterItem;
-import com.pje.employeemanager.model.holiday.HolidayStatusRequest;
+import com.pje.employeemanager.model.holiday.*;
+import com.pje.employeemanager.model.work.WorkAdminListItem;
 import com.pje.employeemanager.model.work.WorkDetail;
+import com.pje.employeemanager.model.work.WorkSearchRequest;
 import com.pje.employeemanager.service.HolidayService;
 import com.pje.employeemanager.service.MemberService;
 import com.pje.employeemanager.service.ResponseService;
@@ -85,4 +84,10 @@ public class HolidayController {
         return ResponseService.getSuccessResult();
     }
 
+    /** 관리자용 휴가 신청 리스트 가져오기 (필터기능 o) */
+    @ApiOperation(value = "관리자용 휴가 신청 리스트 가져오기")
+    @PostMapping("/holiday/page/{pageNum}")
+    public ListResult<HolidayAdminListItem> getHolidayListByAdmin(@PathVariable int pageNum, @RequestBody @Valid HolidaySearchRequest holidaySearchRequest) {
+        return ResponseService.getListResult(holidayService.getList(pageNum, holidaySearchRequest), true);
+    }
 }

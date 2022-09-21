@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDate;
 
 @Getter
@@ -25,12 +27,15 @@ public class MemberSearchRequest {
     private String phone;  // like 검색
 
     @ApiModelProperty(notes = "사원 성별")
+    @Enumerated(value = EnumType.STRING)
     private Gender gender; // 일치하는 것 검색
 
     @ApiModelProperty(notes = "사원 부서")
+    @Enumerated(value = EnumType.STRING)
     private Department department;  // 일치하는 것 검색
 
     @ApiModelProperty(notes = "사원 직급")
+    @Enumerated(value = EnumType.STRING)
     private Position position;  // 일치하는 것 검색
 
     @ApiModelProperty(notes = "사원 재직(활성) 여부")
