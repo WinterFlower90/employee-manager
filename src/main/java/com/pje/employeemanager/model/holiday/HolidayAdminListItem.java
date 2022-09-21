@@ -75,6 +75,7 @@ public class HolidayAdminListItem {
         private final LocalDateTime dateApproval; //승인 시간 (update 개념)
         private final LocalDateTime dateRefusal; //반려 시간 (update 개념)
 
+
         public HolidayAdminListItemBuilder(HolidayHistory holidayHistory) {
             this.memberId = holidayHistory.getMember().getId();
             this.holidayHistoryId = holidayHistory.getId();

@@ -72,6 +72,12 @@ public class HolidayController {
 
     }
 
+    @ApiOperation(value = "사원별 연차 현황 리스트 가져오기")
+    @GetMapping("/member/all")
+    public ListResult<HolidayCountListItem> getHolidayCounts() {
+        return ResponseService.getListResult(holidayService.getHolidayCounts(), true);
+    }
+
     /** 사원 연차 갯수 변경하기(증감) - 관리자용 */
     @ApiOperation(value = "사원 연차 갯수 변경하기")
     @ApiImplicitParams({

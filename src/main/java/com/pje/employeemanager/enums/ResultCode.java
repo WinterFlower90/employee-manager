@@ -21,6 +21,8 @@ public enum ResultCode {
     ,NOT_SAME_STATUS(-40001, "같은 근태상태로는 다시 변경 할 수 없습니다.")
     ,ALREADY_WORK_IN(-40002, "근태상태를 다시 출근으로 변경 할 수 없습니다.")
     ,ALREADY_WORK_OUT(-40003, "퇴근 후에는 상태를 다시 변경할 수 없습니다.")
+
+    ,NO_HOLIDAY_COUNT_REMAIN(-50000, "남은 연차 수량이 부족합니다.")
     ;
 
 

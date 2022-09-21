@@ -66,5 +66,11 @@ public class ExceptionAdvice {
     protected CommonResult customException(HttpServletRequest request, CNoWorkDataException e) {
         return ResponseService.getFailResult(ResultCode.NO_WORK_DATA);
     }
+
+    @ExceptionHandler(CNoHolidayCountRemainException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult customException(HttpServletRequest request, CNoHolidayCountRemainException e) {
+        return ResponseService.getFailResult(ResultCode.NO_HOLIDAY_COUNT_REMAIN);
+    }
 }
 

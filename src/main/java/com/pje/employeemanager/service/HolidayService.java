@@ -7,6 +7,7 @@ import com.pje.employeemanager.entity.Work;
 import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.enums.HolidayType;
 import com.pje.employeemanager.exception.CMissingDataException;
+import com.pje.employeemanager.exception.CNoHolidayCountRemainException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.holiday.*;
 import com.pje.employeemanager.model.member.MemberSearchRequest;
@@ -83,6 +84,18 @@ public class HolidayService {
         return ListConvertService.settingResult(result);
     }
 
+    /** 사원별 연차 현황 리스트 가져오기 - 관리자용 */
+    public ListResult<HolidayCountListItem> getHolidayCounts() {
+        List<HolidayCount> counts = holidayCountRepository.findAll();
+        List<HolidayCountListItem> result = new LinkedList<>();
+
+        counts.forEach(holidayCount -> {
+            HolidayCountListItem addItem = new HolidayCountListItem.HolidayCountListItemBuilder(holidayCount).build();
+            result.add(addItem);
+        });
+        return ListConvertService.settingResult(result);
+    }
+
     /** U : 휴가 승인상태 변경하기 - 관리자 가능
      * (exception 보완하기) */
     public void putHolidayStatus(long holidayHistoryId, HolidayStatusRequest holidayStatusRequest) {
@@ -92,6 +105,8 @@ public class HolidayService {
             HolidayCount holidayCount = holidayCountRepository.findTopByMemberIdOrderByDateHolidayCountStartDesc(holidayHistory.getMember().getId()).orElseThrow(CMissingDataException::new);
 
             float plusValue = holidayHistory.getHolidayType() == HolidayType.ANNUAL ? 1f : 0.5f;
+
+            if (plusValue > holidayCount.getHolidayRemain()) throw new CNoHolidayCountRemainException();
 
             holidayCount.putCountUse(plusValue);
             holidayCountRepository.save(holidayCount);
