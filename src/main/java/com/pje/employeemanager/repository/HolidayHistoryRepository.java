@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface HolidayHistoryRepository extends JpaRepository<HolidayHistory, Long> {
     List<HolidayHistory> findAllByDateDesiredGreaterThanEqualAndDateDesiredLessThanEqualOrderByIdDesc(LocalDate dateStart, LocalDate dateEnd);
+    int countByDateDesiredAndMember_Id(LocalDate dateDesired, long memberId);
 }

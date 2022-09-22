@@ -6,8 +6,10 @@ import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.entity.Work;
 import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.enums.HolidayType;
+import com.pje.employeemanager.exception.CAlreadyHolidayStatusDataException;
 import com.pje.employeemanager.exception.CMissingDataException;
 import com.pje.employeemanager.exception.CNoHolidayCountRemainException;
+import com.pje.employeemanager.exception.COverlapHolidayDataException;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.holiday.*;
 import com.pje.employeemanager.model.member.MemberSearchRequest;
@@ -101,12 +103,16 @@ public class HolidayService {
     public void putHolidayStatus(long holidayHistoryId, HolidayStatusRequest holidayStatusRequest) {
         HolidayHistory holidayHistory = holidayHistoryRepository.findById(holidayHistoryId).orElseThrow(CMissingDataException::new);
 
+        if (holidayHistoryRepository.countByDateDesiredAndMember_Id(holidayHistory.getDateDesired(), holidayHistory.getMember().getId()) > 1 ) throw new COverlapHolidayDataException();
+        //휴가 신청 날짜와 memberId를 조회해서 데이터가 1개 이상이면 (=중복된 데이터가 2개이상이면) - 이미 동일한 날짜에 신청한 휴가가 있습니다. throw
+        if (holidayHistory.getHolidayStatus() != HolidayStatus.NO_STATUS) throw new CAlreadyHolidayStatusDataException(); //휴가상태가 검토중이 아니라면 : 이미 휴가처리가 완료되었습니다. throw
+
         if (holidayStatusRequest.getHolidayStatus().equals(HolidayStatus.OK)) {
             HolidayCount holidayCount = holidayCountRepository.findTopByMemberIdOrderByDateHolidayCountStartDesc(holidayHistory.getMember().getId()).orElseThrow(CMissingDataException::new);
 
             float plusValue = holidayHistory.getHolidayType() == HolidayType.ANNUAL ? 1f : 0.5f;
 
-            if (plusValue > holidayCount.getHolidayRemain()) throw new CNoHolidayCountRemainException();
+            if (plusValue > holidayCount.getHolidayRemain()) throw new CNoHolidayCountRemainException(); //잔여 연차 갯수가 사용할 연차 갯수보다 작으면 throw
 
             holidayCount.putCountUse(plusValue);
             holidayCountRepository.save(holidayCount);

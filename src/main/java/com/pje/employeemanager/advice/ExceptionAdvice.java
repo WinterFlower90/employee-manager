@@ -72,5 +72,17 @@ public class ExceptionAdvice {
     protected CommonResult customException(HttpServletRequest request, CNoHolidayCountRemainException e) {
         return ResponseService.getFailResult(ResultCode.NO_HOLIDAY_COUNT_REMAIN);
     }
+
+    @ExceptionHandler(CAlreadyHolidayStatusDataException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult customException(HttpServletRequest request, CAlreadyHolidayStatusDataException e) {
+        return ResponseService.getFailResult(ResultCode.ALREADY_HOLIDAY_STATUS);
+    }
+
+    @ExceptionHandler(COverlapHolidayDataException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult customException(HttpServletRequest request, COverlapHolidayDataException e) {
+        return ResponseService.getFailResult(ResultCode.OVERLAP_HOLIDAY_DATA);
+    }
 }
 
