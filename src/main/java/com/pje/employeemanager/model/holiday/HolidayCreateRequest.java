@@ -13,18 +13,17 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class HolidayApplicationRequest {
+public class HolidayCreateRequest {
     @ApiModelProperty(notes = "휴가 타입", required = true)
     @Enumerated(value = EnumType.STRING)
     private HolidayType holidayType;
 
     @ApiModelProperty(notes = "휴가 사유", required = true)
-    @Length(min = 2)
+    @Length(min = 2, max = 20)
     @NotNull
     private String reason;
 
     @ApiModelProperty(notes = "희망 날짜", required = true)
     @NotNull
     private LocalDate dateDesired;
-
 }

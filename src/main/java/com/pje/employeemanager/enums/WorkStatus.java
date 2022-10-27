@@ -12,6 +12,7 @@ public enum WorkStatus {
     EARLY_LEAVE ("조퇴"),
     LEAVE_WORK ("퇴근"),
     NO_STATUS ("상태없음") //상태없음 일때만 출근버튼이 보여야한다.
+
     ;
     private final String name;
 }

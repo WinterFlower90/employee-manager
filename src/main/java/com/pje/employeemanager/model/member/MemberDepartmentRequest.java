@@ -19,5 +19,4 @@ public class MemberDepartmentRequest {
     @ApiModelProperty(notes = "사원 직급(~20글자)", required = true)
     @Enumerated(value = EnumType.STRING)
     private Position position; //직급
-
 }

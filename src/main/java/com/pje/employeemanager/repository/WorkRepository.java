@@ -1,5 +1,6 @@
 package com.pje.employeemanager.repository;
 
+import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.entity.Work;
 import com.pje.employeemanager.model.work.WorkDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     List<Work> findAllByMember_Id(Long memberId);
 
     Optional<Work> findByDateWorkAndMember_Id(LocalDate dateWork, long memberId);
+
+    long countByMemberAndDateCreateGreaterThanEqualAndDateCreateLessThanEqual(Member member, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

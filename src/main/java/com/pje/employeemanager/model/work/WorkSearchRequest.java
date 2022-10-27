@@ -30,4 +30,5 @@ public class WorkSearchRequest {
 
     @ApiModelProperty(notes = "근무일 (검색 종료일)")
     private LocalDate dateWorkEnd; //근무 일자
+
 }

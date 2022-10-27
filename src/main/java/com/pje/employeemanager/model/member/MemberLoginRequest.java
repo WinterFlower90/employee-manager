@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class MemberLoginRequest {
+
     @ApiModelProperty(value = "사원 아이디", required = true)
     @NotNull
     @Length(min = 6, max = 20)

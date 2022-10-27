@@ -14,4 +14,5 @@ public class WorkStatusRequest {
     @ApiModelProperty(notes = "근무 상태 타입", required = true)
     @Enumerated(value = EnumType.STRING)
     private WorkStatus workStatus; //상태
+
 }

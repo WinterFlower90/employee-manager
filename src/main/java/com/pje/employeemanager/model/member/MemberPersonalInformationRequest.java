@@ -25,6 +25,4 @@ public class MemberPersonalInformationRequest {
     @ApiModelProperty(notes = "프로필사진 url", required = false)
     @Enumerated(value = EnumType.STRING)
     private String profileImageUrl; //프로필 사진 url
-
-
 }

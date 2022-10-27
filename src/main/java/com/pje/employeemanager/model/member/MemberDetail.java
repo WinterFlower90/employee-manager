@@ -57,6 +57,7 @@ public class MemberDetail {
         this.department = builder.department;
         this.position = builder.position;
         this.dateJoin = builder.dateJoin;
+
     }
 
     public static class MemberDetailBuilder implements CommonModelBuilder<MemberDetail> {

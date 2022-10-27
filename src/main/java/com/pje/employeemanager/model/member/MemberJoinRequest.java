@@ -31,6 +31,7 @@ public class MemberJoinRequest {
     @NotNull
     private String phone; //연락처
 
+
     @ApiModelProperty(notes = "사원 생년월일", required = true)
     @NotNull
     private LocalDate birthday; //생년월일

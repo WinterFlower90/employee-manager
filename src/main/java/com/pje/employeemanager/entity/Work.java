@@ -23,7 +23,7 @@ public class Work {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId", nullable = false)
-    private Member member;
+    private Member member; //출근회원
 
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
@@ -35,16 +35,13 @@ public class Work {
     @Column(nullable = false)
     private LocalTime inWork; //출근 시간
 
-    @Column(nullable = true)
+
     private LocalTime pauseWork; //외출 시간
 
-    @Column(nullable = true)
     private LocalTime returnWork; //복귀 시간
 
-    @Column(nullable = true)
     private LocalTime earlyLeaveWork; //조퇴 시간
 
-    @Column(nullable = true)
     private LocalTime outWork; //퇴근 시간
 
     @Column(nullable = false)

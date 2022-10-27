@@ -29,6 +29,7 @@ public class WorkStatusResponse {
             this.workStatus = work.getWorkStatus();
         }
 
+
         @Override
         public WorkStatusResponse build() {
             return new WorkStatusResponse(this);

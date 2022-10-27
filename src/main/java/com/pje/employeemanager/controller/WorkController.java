@@ -28,15 +28,55 @@ public class WorkController {
     private final MemberService memberService;
     private final WorkService workService;
 
+    @ApiOperation(value = "근무 정보 가져오기2")
+    @GetMapping("/status/member-id/{memberId}")
+    public SingleResult<WorkResponse> getStatus(@PathVariable long memberId) {
+        return ResponseService.getSingleResult(workService.getCurrentStatus(memberId));
+    }
+
+    @ApiOperation(value = "근무 상태 수정하기2")
+    @PutMapping("/status/{workStatus}/member-id/{memberId}")
+    public SingleResult<WorkResponse> doStatusChange(
+            @PathVariable WorkStatus workStatus,
+            @PathVariable long memberId) {
+        return ResponseService.getSingleResult(workService.doWorkChange(memberId, workStatus));
+    }
+
+    @ApiOperation(value = "근무 정보 가져오기(test)")
+    @GetMapping("/work-test/{memberId}")
+    public SingleResult<WorkTestDetail> getWorkTest(@PathVariable long memberId) {
+        return ResponseService.getSingleResult(workService.getWorkTest(memberId));
+    }
+
+    @ApiOperation(value = "근무 정보 기간별 리스트 가져오기(test)")
+    @GetMapping("/work-test/period/{memberId}")
+    public ListResult<WorkTestDetail> getWorkTests(
+            @PathVariable long memberId,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateStart")LocalDate dateStart,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateEnd")LocalDate dateEnd
+    ) {
+        return ResponseService.getListResult(workService.getWorkTests(memberId, dateStart, dateEnd), true);
+    }
+
+    @ApiOperation(value = "특정 사원의 특정 년 월의 근무 횟수 조회하기(test)")
+    @GetMapping("/search/count/test/{memberId}")
+    public CommonResult getCountByMyYearMonthTest(@PathVariable long memberId, int year, int month) {
+        return ResponseService.getSingleResult(workService.getCountByMyYearMonthTest(memberId, year, month));
+    }
+
+
+    //
+
     @ApiOperation(value = "근무 정보 등록하기")
     @PostMapping("/new")
-    public CommonResult setWork(Member member) {
+    public CommonResult setWork(long memberId) {
+        Member member = memberService.getMemberData(memberId); //해당줄 추가. setWork(Member member) -> (long memberId)로 변환.
         workService.setWork(member);
         return ResponseService.getSuccessResult();
     }
 
     @ApiOperation(value = "기간별 출근 내역 리스트 가져오기")
-    @GetMapping("/work/search")
+    @GetMapping("/search")
     public ListResult<WorkDetail> getWorkDetails(
             @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateStart")LocalDate dateStart,
             @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateEnd")LocalDate dateEnd
@@ -45,7 +85,7 @@ public class WorkController {
     }
 
     @ApiOperation(value = "사원별 출근 내역 리스트 가져오기")
-    @GetMapping("/work/member/search/{memberId}")
+    @GetMapping("/member/search/{memberId}")
     public ListResult<WorkDetail> getMemberWorkDetails(@PathVariable long memberId) {
         return ResponseService.getListResult(workService.getMemberWorkDetails(memberId), true);
     }
@@ -91,5 +131,13 @@ public class WorkController {
     @PostMapping("/works/page/{pageNum}")
     public ListResult<WorkAdminListItem> getWorkListByAdmin(@PathVariable int pageNum, @RequestBody @Valid WorkSearchRequest workSearchRequest) {
         return ResponseService.getListResult(workService.getList(pageNum, workSearchRequest), true);
+    }
+
+    /** 특정 년 월의 근무 횟수 조회하기 */
+    @ApiOperation(value = "특정 사원의 특정 년 월의 근무 횟수 조회하기")
+    @GetMapping("/search/count/{memberId}")
+    public CommonResult getCountByMyYearMonth(@PathVariable long memberId, int year, int month) {
+        Member member = memberService.getMemberData(memberId);
+        return ResponseService.getSingleResult(workService.getCountByMyYearMonth(member, year, month));
     }
 }

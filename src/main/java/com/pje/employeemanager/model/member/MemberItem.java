@@ -87,6 +87,7 @@ public class MemberItem {
             this.dateRetire = member.getDateRetire();
         }
 
+
         @Override
         public MemberItem build() {
             return new MemberItem(this);

@@ -2,15 +2,14 @@ package com.pje.employeemanager.service;
 
 import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.entity.Work;
+import com.pje.employeemanager.entity.WorkTest;
 import com.pje.employeemanager.enums.WorkStatus;
 import com.pje.employeemanager.exception.*;
 import com.pje.employeemanager.model.ListResult;
-import com.pje.employeemanager.model.member.MemberAdminListItem;
-import com.pje.employeemanager.model.member.MemberSearchRequest;
 import com.pje.employeemanager.model.work.*;
-import com.pje.employeemanager.repository.HolidayHistoryRepository;
 import com.pje.employeemanager.repository.MemberRepository;
 import com.pje.employeemanager.repository.WorkRepository;
+import com.pje.employeemanager.repository.WorkTestRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -27,6 +26,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -37,8 +38,103 @@ public class WorkService {
     private final WorkRepository workRepository;
     private final MemberRepository memberRepository;
 
+    private final WorkTestRepository workTestRepository;
+
     @PersistenceContext
     EntityManager entityManager;
+
+    public WorkResponse getCurrentStatus(long memberId) {
+        Optional<WorkTest> work = workTestRepository.findByDateWorkAndMemberId(LocalDate.now(), memberId);
+
+        if (work.isEmpty()) return new WorkResponse.WorkResponseNoneBuilder().build();
+        else return new WorkResponse.WorkResponseBuilder(work.get()).build();
+    }
+
+    public WorkResponse doWorkChange(long memberId, WorkStatus workStatus) {
+        Optional<WorkTest> work = workTestRepository.findByDateWorkAndMemberId(LocalDate.now(), memberId);
+
+        WorkTest workResult;
+        if (work.isEmpty()) workResult = setAttendance(memberId);
+        else workResult = putAttendance(work.get(), workStatus);
+
+        return new WorkResponse.WorkResponseBuilder(workResult).build();
+    }
+
+    private WorkTest setAttendance(long memberId) {
+        WorkTest data = new WorkTest.WorkTestBuilder(memberId).build();
+        return workTestRepository.save(data);
+    }
+
+    private WorkTest putAttendance(WorkTest workTest, WorkStatus workStatus) {
+        // 출근 후에는 다시 출근상태로 변경 할 수 없다.
+        if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException();
+
+        // 같은 상태로는 변경 할 수 없다.
+        if (workTest.getWorkStatus().equals(workStatus)) throw new CNotChangeSameDataException();
+
+        // 퇴근 후에는 상태를 변경 할 수 없다.
+        if (workTest.getWorkStatus().equals(WorkStatus.LEAVE_WORK)) throw new CAlreadyWorkOutDataException();
+
+        workTest.putStatus(workStatus);
+        return workTestRepository.save(workTest);
+    }
+
+    public WorkTestDetail getWorkTest(long memberId) {
+        WorkTest workTest = workTestRepository.findById(memberId).orElseThrow(CMissingDataException::new);
+        return new WorkTestDetail.WorkDetailBuilder(workTest).build();
+    }
+
+    public ListResult<WorkTestDetail> getWorkTests(long memberId, LocalDate dateStart, LocalDate dateEnd) {
+        LocalDate startDate = LocalDate.of(dateStart.getYear(), dateStart.getMonthValue(), dateStart.getDayOfMonth());
+        LocalDate endDate = LocalDate.of(dateEnd.getYear(), dateEnd.getMonthValue(), dateEnd.getDayOfMonth());
+
+        List<WorkTest> workTests = workTestRepository.findAllByDateWorkGreaterThanEqualAndDateWorkLessThanEqualOrderByIdDesc(startDate, endDate);
+
+        List<WorkTestDetail> result = new LinkedList<>();
+        workTests.forEach(workTest -> {
+            WorkTestDetail workTestDetail = new WorkTestDetail.WorkDetailBuilder(workTest).build();
+            result.add(workTestDetail);
+        });
+
+        return ListConvertService.settingResult(result);
+    }
+
+    public WorkStatusCountResponse getCountByWorkStatus() {
+        WorkStatusCountResponse response = new WorkStatusCountResponse();
+
+        long countAttendance = workTestRepository.countByWorkStatus(WorkStatus.ATTENDANCE);
+        long countEarlyLeave = workTestRepository.countByWorkStatus(WorkStatus.EARLY_LEAVE);
+        long countNoStatus = workTestRepository.countByWorkStatus(WorkStatus.NO_STATUS);
+
+        response.setCountAttendance(countAttendance);
+        response.setCountEarlyLeave(countEarlyLeave);
+        response.setCountNoStatus(countNoStatus);
+
+        return response;
+    }
+
+    public long getCountByMyYearMonthTest(long memberId, int year, int month) {
+        /*
+        LocalDate dateToday = LocalDate.now();
+        int todayYear = dateToday.getYear();
+        int todayMonth = dateToday.getMonthValue();
+        int todayDay = dateToday.getDayOfMonth();
+        */
+
+        LocalDateTime dateStart = LocalDateTime.of(year, month, 1, 0, 0, 0);
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month - 1, 1);
+        int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        LocalDateTime dateEnd = LocalDateTime.of(year, month, maxDay, 23, 59, 59);
+
+        long countResult = workTestRepository.countByMemberIdAndDateCreateGreaterThanEqualAndDateCreateLessThanEqual(memberId, dateStart, dateEnd);
+
+        return countResult;
+    }
+
+
+    //
 
 
     /** 근무 등록하기 - 매일 자동등록 */
@@ -207,5 +303,26 @@ public class WorkService {
         query.setMaxResults(pageable.getPageSize()); //데이터를 가져오는 종료지점
 
         return new PageImpl<>(query.getResultList(), pageable, totalRows); //페이징을 구현한 데이터를 반환함 (현재 선택된 페이지의 데이터들, 페이징 객체, 총 데이터 수)
+    }
+
+    /** 특정 사원의 특정 년/월 근무일수 구하기 */
+    public long getCountByMyYearMonth(Member member, int year, int month) {
+        /*
+        LocalDate dateToday = LocalDate.now();
+        int todayYear = dateToday.getYear();
+        int todayMonth = dateToday.getMonthValue();
+        int todayDay = dateToday.getDayOfMonth();
+        */
+
+        LocalDateTime dateStart = LocalDateTime.of(year, month, 1, 0, 0, 0);
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month - 1, 1);
+        int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        LocalDateTime dateEnd = LocalDateTime.of(year, month, maxDay, 23, 59, 59);
+
+        long countResult = workRepository.countByMemberAndDateCreateGreaterThanEqualAndDateCreateLessThanEqual(member, dateStart, dateEnd);
+
+        return countResult;
     }
 }

@@ -33,6 +33,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,9 +67,20 @@ public class HolidayService {
 
 
     /** C : 휴가 신청하기 - 사원용 */
-    public void setHolidayRegister(Member member, HolidayApplicationRequest request) {
-        HolidayHistory holidayHistory = new HolidayHistory.HolidayRegisterBuilder(member, request).build();
+    public void setHolidayCreate(Member member, HolidayCreateRequest request) {
+        HolidayHistory holidayHistory = new HolidayHistory.HolidayCreateBuilder(member, request).build();
         holidayHistoryRepository.save(holidayHistory);
+    }
+
+    public ListResult<HolidayRegisterItem> getHolidayRegister() {
+        List<HolidayHistory> holidayHistories = holidayHistoryRepository.findAll();
+
+        List<HolidayRegisterItem> result = new LinkedList<>();
+        holidayHistories.forEach(holidayHistory -> {
+            HolidayRegisterItem addItem = new HolidayRegisterItem.HolidayRegisterItemBuilder(holidayHistory).build();
+            result.add(addItem);
+        });
+        return ListConvertService.settingResult(result);
     }
 
     /** R : 일자별 휴가 신청 리스트 가져오기 */
@@ -182,5 +194,27 @@ public class HolidayService {
         query.setMaxResults(pageable.getPageSize()); //데이터를 가져오는 종료지점
 
         return new PageImpl<>(query.getResultList(), pageable, totalRows); //페이징을 구현한 데이터를 반환함 (현재 선택된 페이지의 데이터들, 페이징 객체, 총 데이터 수)
+    }
+
+    /** 휴가 신청 내역 가져오기 (관리자용) */
+    public ListResult<HolidayAdminListItem> getListByAdmin(int pageNum, HolidayListSearchRequest searchRequest) {
+        Page<HolidayHistory> originList;
+        PageRequest pageRequest = PageRequest.of(pageNum, 10);
+        LocalDate startDate = LocalDate.of(searchRequest.getDateStart().getYear(), searchRequest.getDateStart().getMonthValue(), searchRequest.getDateStart().getDayOfMonth());
+        LocalDate endDate = LocalDate.of(searchRequest.getDateEnd().getYear(), searchRequest.getDateEnd().getMonthValue(), searchRequest.getDateEnd().getDayOfMonth());
+
+        if (searchRequest.getMemberId() == null) {
+            originList = holidayHistoryRepository.findAllByDateDesiredGreaterThanEqualAndDateDesiredLessThanEqualOrderByDateDesiredDesc(startDate, endDate, pageRequest);
+        } else {
+            originList = holidayHistoryRepository.findAllByMember_IdAndDateDesiredGreaterThanEqualAndDateDesiredLessThanEqualOrderByDateDesiredDesc(searchRequest.getMemberId(), startDate, endDate, pageRequest);
+        }
+
+        List<HolidayAdminListItem> result = new LinkedList<>();
+        originList.getContent().forEach(holidayHistory -> {
+            HolidayAdminListItem addItem = new HolidayAdminListItem.HolidayAdminListItemBuilder(holidayHistory).build();
+            result.add(addItem);
+        });
+
+        return ListConvertService.settingResult(result, originList.getTotalElements(), originList.getTotalPages(), originList.getPageable().getPageNumber());
     }
 }

@@ -5,6 +5,7 @@ import com.pje.employeemanager.enums.HolidayType;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import com.pje.employeemanager.model.holiday.HolidayApplicationRequest;
 import com.pje.employeemanager.model.holiday.HolidayCountRequest;
+import com.pje.employeemanager.model.holiday.HolidayCreateRequest;
 import com.pje.employeemanager.model.holiday.HolidayStatusRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -29,11 +30,11 @@ public class HolidayHistory {
 
     /** 연차 갯수를 줄 수도 있기 때문에 증감 여부로 설계 */
     @ApiModelProperty(notes = "차감여부 (true 차감, false 증가)")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Boolean isMinus;
 
     @ApiModelProperty(notes = "증감값")
-    @Column(nullable = false)
+    @Column
     private Float increaseOrDecreaseValue;
 
     @Column(nullable = false)
@@ -59,10 +60,10 @@ public class HolidayHistory {
     @Enumerated(value = EnumType.STRING)
     private HolidayStatus holidayStatus; //승인 여부 - 검토중 / 승인 / 반려
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private LocalDateTime dateApproval; //승인 시간 (update 개념)
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private LocalDateTime dateRefusal; //반려 시간 (update 개념)
 
 
@@ -87,6 +88,36 @@ public class HolidayHistory {
             this.increaseOrDecreaseValue = holidayCountRequest.getIncreaseOrDecreaseValue();
             this.dateCreate = LocalDateTime.now();
             this.dateUpdate = LocalDateTime.now();
+        }
+
+        @Override
+        public HolidayHistory build() {
+            return new HolidayHistory(this);
+        }
+    }
+
+    private HolidayHistory(HolidayCreateBuilder builder) {
+        this.member = builder.member;
+        this.holidayType = builder.holidayType;
+        this.reason = builder.reason;
+        this.dateDesired = builder.dateDesired;
+        this.dateCreate = builder.dateCreate;
+
+    }
+
+    public static class HolidayCreateBuilder implements CommonModelBuilder<HolidayHistory> {
+        private final Member member;
+        private final HolidayType holidayType;
+        private final String reason;
+        private final LocalDate dateDesired;
+        private final LocalDateTime dateCreate;
+
+        public HolidayCreateBuilder(Member member, HolidayCreateRequest createRequest){
+            this.member = member;
+            this.holidayType = createRequest.getHolidayType();
+            this.reason = createRequest.getReason();
+            this.dateDesired = createRequest.getDateDesired();
+            this.dateCreate = LocalDateTime.now();
         }
 
         @Override

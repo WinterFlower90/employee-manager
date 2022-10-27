@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class MemberAdminListItem {
+
     @ApiModelProperty(notes = "사원 시퀀스")
     private Long memberId; //사원 시퀀스
 

@@ -26,7 +26,7 @@ public class MemberController {
     private final MemberService memberService;
     private final HolidayService holidayService;
 
-    /** 사원 등록 - 관리자용*/
+    /** 사원 등록 - 관리자용 */
     @ApiOperation(value = "사원 등록 및 연차 등록하기")
     @PostMapping("/new")
     public CommonResult setMember(@RequestBody @Valid MemberJoinRequest joinRequest) {
@@ -35,7 +35,8 @@ public class MemberController {
         return ResponseService.getSuccessResult();
     }
 
-    /** 사원, 관리자 조회가능 */
+    /** 사원, 관리자 조회가능
+     * 사내 연락망 확인해야 할 수도 있기 때문에 사원도 확인할 수 있다고 생각함 */
     @ApiOperation(value = "사원 리스트 가져오기")
     @GetMapping("get/list/search")
     public ListResult<MemberItem> getMembers(
@@ -83,7 +84,7 @@ public class MemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @PutMapping("/put-department/{memberId}")
+    @PutMapping("/department/{memberId}")
     public CommonResult putDepartment(@PathVariable long memberId, @RequestBody @Valid MemberDepartmentRequest departmentRequest) {
         memberService.putDepartment(memberId, departmentRequest);
         return ResponseService.getSuccessResult();
@@ -104,7 +105,7 @@ public class MemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @PutMapping("/put-manager/{memberId}")
+    @PutMapping("/manager/{memberId}")
     public CommonResult putManager(@PathVariable long memberId) {
         memberService.putManager(memberId);
         return ResponseService.getSuccessResult();
@@ -115,7 +116,7 @@ public class MemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @PutMapping("/put-retire/{memberId}")
+    @DeleteMapping("/retire/{memberId}")
     public CommonResult putRetire(@PathVariable long memberId) {
         memberService.putMemberRetire(memberId);
         return ResponseService.getSuccessResult();

@@ -1,30 +1,25 @@
 package com.pje.employeemanager.model.work;
 
-import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.entity.Work;
-import com.pje.employeemanager.enums.WorkStatus;
+import com.pje.employeemanager.entity.WorkTest;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WorkDetail {
+public class WorkTestDetail {
     @ApiModelProperty(notes = "근무 시퀀스")
     private Long workId;
 
     @ApiModelProperty(notes = "사원 시퀀스")
     private Long memberId;
-
-    @ApiModelProperty(notes = "[부서] 사원 이름 + 사원 직급")
-    private String memberFullName;
 
     @ApiModelProperty(notes = "근무 일자")
     private LocalDate dateWork;
@@ -44,45 +39,48 @@ public class WorkDetail {
     @ApiModelProperty(notes = "퇴근 시간", required = false)
     private LocalTime outWork;
 
-    private WorkDetail(WorkDetailBuilder builder) {
+    @ApiModelProperty(notes = "데이터 생성시간")
+    private LocalDateTime dateCreate;
+
+    private WorkTestDetail(WorkDetailBuilder builder) {
         this.workId = builder.workId;
         this.memberId = builder.memberId;
-        this.memberFullName = builder.memberFullName;
         this.dateWork = builder.dateWork;
         this.workStatus = builder.workStatus;
         this.inWork = builder.inWork;
         this.pauseWork = builder.pauseWork;
         this.returnWork = builder.returnWork;
         this.outWork = builder.outWork;
+        this.dateCreate = builder.dateCreate;
     }
 
 
-    public static class WorkDetailBuilder implements CommonModelBuilder<WorkDetail> {
+    public static class WorkDetailBuilder implements CommonModelBuilder<WorkTestDetail> {
         private final Long workId;
         private final Long memberId;
-        private final String memberFullName;
         private final LocalDate dateWork;
         private final String workStatus;
         private final LocalTime inWork;
         private final LocalTime pauseWork;
         private final LocalTime returnWork;
         private final LocalTime outWork;
+        private final LocalDateTime dateCreate;
 
-        public WorkDetailBuilder(Work work) {
-            this.workId = work.getId();
-            this.memberId = work.getMember().getId();
-            this.memberFullName = "[" + work.getMember().getDepartment().getName() + "] " + work.getMember().getName() + " " + work.getMember().getPosition().getName();
-            this.dateWork = work.getDateWork();
-            this.workStatus = work.getWorkStatus().getName();
-            this.inWork = work.getInWork();
-            this.pauseWork = work.getPauseWork();
-            this.returnWork = work.getReturnWork();
-            this.outWork = work.getOutWork();
+        public WorkDetailBuilder(WorkTest workTest) {
+            this.workId = workTest.getId();
+            this.memberId = workTest.getMemberId();
+            this.dateWork = workTest.getDateWork();
+            this.workStatus = workTest.getWorkStatus().getName();
+            this.inWork = workTest.getInWork();
+            this.pauseWork = workTest.getPauseWork();
+            this.returnWork = workTest.getReturnWork();
+            this.outWork = workTest.getOutWork();
+            this.dateCreate = workTest.getDateCreate();
         }
 
         @Override
-        public WorkDetail build() {
-            return new WorkDetail(this);
+        public WorkTestDetail build() {
+            return new WorkTestDetail(this);
         }
     }
 }

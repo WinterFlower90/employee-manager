@@ -219,6 +219,7 @@ public class MemberService {
 
         int totalRows = query.getResultList().size(); //총 데이터 갯수를 가져옴
 
+
         //사용자에게 제공 될 결과데이터들을 가져옴
         query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize()); //데이터를 가져오는 시작지점
         query.setMaxResults(pageable.getPageSize()); //데이터를 가져오는 종료지점

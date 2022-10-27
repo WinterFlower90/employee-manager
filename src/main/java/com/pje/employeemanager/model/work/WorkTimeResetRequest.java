@@ -11,7 +11,6 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class WorkTimeResetRequest {
-
     private Member member;
 
     @ApiModelProperty(notes = "출근 시간", required = true)

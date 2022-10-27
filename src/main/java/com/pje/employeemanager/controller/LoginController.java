@@ -1,8 +1,10 @@
 package com.pje.employeemanager.controller;
 
+import com.pje.employeemanager.model.SingleResult;
 import com.pje.employeemanager.model.member.MemberLoginRequest;
 import com.pje.employeemanager.model.member.MemberLoginResponse;
 import com.pje.employeemanager.service.MemberService;
+import com.pje.employeemanager.service.ResponseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +24,13 @@ public class LoginController {
 
     @ApiOperation(value = "관리자 로그인")
     @PostMapping("/admin")
-    public MemberLoginResponse doAdminLogin(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
-        return memberService.doLogin(true, memberLoginRequest);
+    public SingleResult<MemberLoginResponse> doAdminLogin(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
+        return ResponseService.getSingleResult(memberService.doLogin(true, memberLoginRequest));
     }
 
     @ApiOperation(value = "사원 로그인")
     @PostMapping("/member")
-    public MemberLoginResponse doMemberLogin(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
-        return memberService.doLogin(true, memberLoginRequest);
+    public SingleResult<MemberLoginResponse> doMemberLogin(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
+        return ResponseService.getSingleResult(memberService.doLogin(false, memberLoginRequest));
     }
 }

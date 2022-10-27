@@ -34,6 +34,7 @@ public class MemberLoginResponse {
         private final String username;
         private final LocalDate dateJoin;
 
+
         public MemberLoginResponseBuilder(Member member) {
             this.memberId = member.getId();
             this.username = member.getUsername();
