@@ -55,11 +55,21 @@ public class Work {
         this.workStatus = workStatus;
 
         switch (workStatus) {
+//            case GOING_OUT :
+//                this.pauseWork = LocalTime.now();
+//                this.dateUpdate = LocalDateTime.now();
+//                break;
+//            case RETURN :
+//                this.returnWork = LocalTime.now();
+//                this.dateUpdate = LocalDateTime.now();
+//                break;
             case EARLY_LEAVE :
                 this.earlyLeaveWork = LocalTime.now();
+                this.dateUpdate = LocalDateTime.now();
                 break;
             case LEAVE_WORK :
                 this.outWork = LocalTime.now();
+                this.dateUpdate = LocalDateTime.now();
                 break;
         }
     }

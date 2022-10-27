@@ -60,15 +60,15 @@ public class HolidayController {
         return ResponseService.getListResult(holidayService.getHolidayRegister(), true);
     }
 
-    /** 기간별 휴가 신청 내역 리스트 가져오기 */
-    @ApiOperation(value = "기간별 휴가 신청 내역 리스트 가져오기")
-    @GetMapping("/holiday/register/search")
-    public ListResult<HolidayRegisterItem> getHolidayRegister(
-            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateStart")LocalDate dateStart,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateEnd")LocalDate dateEnd
-    ) {
-        return ResponseService.getListResult(holidayService.getHolidayRegister(dateStart, dateEnd), true);
-    }
+//    /** 기간별 휴가 신청 내역 리스트 가져오기 */
+//    @ApiOperation(value = "기간별 휴가 신청 내역 리스트 가져오기")
+//    @GetMapping("/holiday/register/search")
+//    public ListResult<HolidayRegisterItem> getHolidayRegister(
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateStart")LocalDate dateStart,
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateEnd")LocalDate dateEnd
+//    ) {
+//        return ResponseService.getListResult(holidayService.getHolidayRegister(dateStart, dateEnd), true);
+//    }
 
     /** 휴가 승인 상태 변경하기 - 관리자용 */
     @ApiOperation(value = "휴가 승인 상태 변경하기")

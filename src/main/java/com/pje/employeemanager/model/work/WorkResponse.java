@@ -1,6 +1,6 @@
 package com.pje.employeemanager.model.work;
 
-import com.pje.employeemanager.entity.WorkTest;
+import com.pje.employeemanager.entity.Work;
 import com.pje.employeemanager.enums.WorkStatus;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import lombok.AccessLevel;
@@ -21,11 +21,16 @@ public class WorkResponse {
         this.workStatus = builder.workStatus;
     }
 
+    private WorkResponse(WorkResponseNoneBuilder builder) {
+        this.workStatusName = builder.workStatusName;
+        this.workStatus = builder.workStatus;
+    }
+
     public static class WorkResponseBuilder implements CommonModelBuilder<WorkResponse> {
         private final String workStatusName;
         private final String workStatus;
 
-        public WorkResponseBuilder(WorkTest work) {
+        public WorkResponseBuilder(Work work) {
             this.workStatusName = work.getWorkStatus().getName();
             this.workStatus = work.getWorkStatus().toString();
         }
@@ -36,10 +41,6 @@ public class WorkResponse {
         }
     }
 
-    private WorkResponse(WorkResponseNoneBuilder builder) {
-        this.workStatusName = builder.workStatusName;
-        this.workStatus = builder.workStatus;
-    }
 
     public static class WorkResponseNoneBuilder implements CommonModelBuilder<WorkResponse> {
         private final String workStatusName;

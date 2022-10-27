@@ -84,19 +84,19 @@ public class HolidayService {
     }
 
     /** R : 일자별 휴가 신청 리스트 가져오기 */
-    public ListResult<HolidayRegisterItem> getHolidayRegister(LocalDate dateStart, LocalDate dateEnd) {
-        LocalDate startDate = LocalDate.of(dateStart.getYear(), dateStart.getMonthValue(), dateStart.getDayOfMonth());
-        LocalDate endDate = LocalDate.of(dateEnd.getYear(), dateEnd.getMonthValue(), dateEnd.getDayOfMonth());
-
-        List<HolidayHistory> holidayHistories = holidayHistoryRepository.findAllByDateDesiredGreaterThanEqualAndDateDesiredLessThanEqualOrderByIdDesc(dateStart, dateEnd);
-
-        List<HolidayRegisterItem> result = new LinkedList<>();
-        holidayHistories.forEach(holidayHistory -> {
-            HolidayRegisterItem addItem = new HolidayRegisterItem.HolidayRegisterItemBuilder(holidayHistory).build();
-            result.add(addItem);
-        });
-        return ListConvertService.settingResult(result);
-    }
+//    public ListResult<HolidayRegisterItem> getHolidayRegister(LocalDate dateStart, LocalDate dateEnd) {
+//        LocalDate startDate = LocalDate.of(dateStart.getYear(), dateStart.getMonthValue(), dateStart.getDayOfMonth());
+//        LocalDate endDate = LocalDate.of(dateEnd.getYear(), dateEnd.getMonthValue(), dateEnd.getDayOfMonth());
+//
+//        List<HolidayHistory> holidayHistories = holidayHistoryRepository.findAllByDateDesiredGreaterThanEqualAndDateDesiredLessThanEqualOrderByIdDesc(dateStart, dateEnd);
+//
+//        List<HolidayRegisterItem> result = new LinkedList<>();
+//        holidayHistories.forEach(holidayHistory -> {
+//            HolidayRegisterItem addItem = new HolidayRegisterItem.HolidayRegisterItemBuilder(holidayHistory).build();
+//            result.add(addItem);
+//        });
+//        return ListConvertService.settingResult(result);
+//    }
 
     /** 사원별 연차 현황 리스트 가져오기 - 관리자용 */
     public ListResult<HolidayCountListItem> getHolidayCounts() {

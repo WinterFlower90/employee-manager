@@ -2,14 +2,12 @@ package com.pje.employeemanager.service;
 
 import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.entity.Work;
-import com.pje.employeemanager.entity.WorkTest;
 import com.pje.employeemanager.enums.WorkStatus;
 import com.pje.employeemanager.exception.*;
 import com.pje.employeemanager.model.ListResult;
 import com.pje.employeemanager.model.work.*;
 import com.pje.employeemanager.repository.MemberRepository;
 import com.pje.employeemanager.repository.WorkRepository;
-import com.pje.employeemanager.repository.WorkTestRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -38,110 +36,52 @@ public class WorkService {
     private final WorkRepository workRepository;
     private final MemberRepository memberRepository;
 
-    private final WorkTestRepository workTestRepository;
 
     @PersistenceContext
     EntityManager entityManager;
 
-    public WorkResponse getCurrentStatus(long memberId) {
-        Optional<WorkTest> work = workTestRepository.findByDateWorkAndMemberId(LocalDate.now(), memberId);
+    /** 현재 근무 상태 불러오기 - API 확인 o  */
+    public WorkResponse getCurrentStatus(Member member) {
+        Optional<Work> work = workRepository.findByDateWorkAndMember_Id(LocalDate.now(), member.getId());
 
         if (work.isEmpty()) return new WorkResponse.WorkResponseNoneBuilder().build();
         else return new WorkResponse.WorkResponseBuilder(work.get()).build();
     }
 
-    public WorkResponse doWorkChange(long memberId, WorkStatus workStatus) {
-        Optional<WorkTest> work = workTestRepository.findByDateWorkAndMemberId(LocalDate.now(), memberId);
+    /** 근무 상태 수정하기 - API 확인 o  */
 
-        WorkTest workResult;
-        if (work.isEmpty()) workResult = setAttendance(memberId);
-        else workResult = putAttendance(work.get(), workStatus);
+    public WorkResponse doWorkChange(Member member, WorkStatus workStatus) {
+        Optional<Work> work = workRepository.findByDateWorkAndMember_Id(LocalDate.now(), member.getId());
+
+        Work workResult;
+        if (work.isEmpty()) workResult = setWork(member);
+        else workResult = putWork(work.get(), workStatus);
 
         return new WorkResponse.WorkResponseBuilder(workResult).build();
-    }
-
-    private WorkTest setAttendance(long memberId) {
-        WorkTest data = new WorkTest.WorkTestBuilder(memberId).build();
-        return workTestRepository.save(data);
-    }
-
-    private WorkTest putAttendance(WorkTest workTest, WorkStatus workStatus) {
-        // 출근 후에는 다시 출근상태로 변경 할 수 없다.
-        if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException();
-
-        // 같은 상태로는 변경 할 수 없다.
-        if (workTest.getWorkStatus().equals(workStatus)) throw new CNotChangeSameDataException();
-
-        // 퇴근 후에는 상태를 변경 할 수 없다.
-        if (workTest.getWorkStatus().equals(WorkStatus.LEAVE_WORK)) throw new CAlreadyWorkOutDataException();
-
-        workTest.putStatus(workStatus);
-        return workTestRepository.save(workTest);
-    }
-
-    public WorkTestDetail getWorkTest(long memberId) {
-        WorkTest workTest = workTestRepository.findById(memberId).orElseThrow(CMissingDataException::new);
-        return new WorkTestDetail.WorkDetailBuilder(workTest).build();
-    }
-
-    public ListResult<WorkTestDetail> getWorkTests(long memberId, LocalDate dateStart, LocalDate dateEnd) {
-        LocalDate startDate = LocalDate.of(dateStart.getYear(), dateStart.getMonthValue(), dateStart.getDayOfMonth());
-        LocalDate endDate = LocalDate.of(dateEnd.getYear(), dateEnd.getMonthValue(), dateEnd.getDayOfMonth());
-
-        List<WorkTest> workTests = workTestRepository.findAllByDateWorkGreaterThanEqualAndDateWorkLessThanEqualOrderByIdDesc(startDate, endDate);
-
-        List<WorkTestDetail> result = new LinkedList<>();
-        workTests.forEach(workTest -> {
-            WorkTestDetail workTestDetail = new WorkTestDetail.WorkDetailBuilder(workTest).build();
-            result.add(workTestDetail);
-        });
-
-        return ListConvertService.settingResult(result);
-    }
-
-    public WorkStatusCountResponse getCountByWorkStatus() {
-        WorkStatusCountResponse response = new WorkStatusCountResponse();
-
-        long countAttendance = workTestRepository.countByWorkStatus(WorkStatus.ATTENDANCE);
-        long countEarlyLeave = workTestRepository.countByWorkStatus(WorkStatus.EARLY_LEAVE);
-        long countNoStatus = workTestRepository.countByWorkStatus(WorkStatus.NO_STATUS);
-
-        response.setCountAttendance(countAttendance);
-        response.setCountEarlyLeave(countEarlyLeave);
-        response.setCountNoStatus(countNoStatus);
-
-        return response;
-    }
-
-    public long getCountByMyYearMonthTest(long memberId, int year, int month) {
-        /*
-        LocalDate dateToday = LocalDate.now();
-        int todayYear = dateToday.getYear();
-        int todayMonth = dateToday.getMonthValue();
-        int todayDay = dateToday.getDayOfMonth();
-        */
-
-        LocalDateTime dateStart = LocalDateTime.of(year, month, 1, 0, 0, 0);
-
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, month - 1, 1);
-        int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        LocalDateTime dateEnd = LocalDateTime.of(year, month, maxDay, 23, 59, 59);
-
-        long countResult = workTestRepository.countByMemberIdAndDateCreateGreaterThanEqualAndDateCreateLessThanEqual(memberId, dateStart, dateEnd);
-
-        return countResult;
     }
 
 
     //
 
 
-    /** 근무 등록하기 - 매일 자동등록 */
-    public void setWork(Member member) {
-        Work work = new Work.WorkBuilder(member).build();
-        workRepository.save(work);
+    /** 근무 등록하기 - 매일 자동등록 - API 확인 o */
+    private Work setWork(Member member) {
+        Work data = new Work.WorkBuilder(member).build();
+        return workRepository.save(data);
     }
+
+    /** 조퇴, 외출, 퇴근 메서드 - API 확인 o */
+    private Work putWork(Work work, WorkStatus workStatus) {
+        if (workStatus.equals(WorkStatus.NO_STATUS)) throw new CNoWorkDataException(); //출근 기록이 없습니다.
+        if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException(); //근태상태를 다시 출근상태로 변경할 수 없습니다.
+        if (workStatus.equals(WorkStatus.LEAVE_WORK) || workStatus.equals(WorkStatus.EARLY_LEAVE)) throw new CAlreadyWorkOutDataException(); //퇴근후에는 상태를 변경할 수 없습니다.
+        if (work.getWorkStatus().equals(workStatus)) throw new CNotChangeSameDataException(); //같은 근태 상태로는 다시 변경할 수 없습니다.
+
+        work.putStatus(workStatus);
+        return workRepository.save(work);
+    }
+
+
 
     /** 출 퇴근 시간 변경하기 - 관리자 가능 */
     public void putWorkTime(long workId, Member member, WorkTimeResetRequest resetRequest) {
@@ -195,7 +135,7 @@ public class WorkService {
         return ListConvertService.settingResult(result);
     }
 
-    /** 근무자별 근무리스트 가져오기 */
+    /** 근무자별 근무리스트 가져오기 - API 확인 o  */
     public ListResult<WorkDetail> getMemberWorkDetails(long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(CMissingDataException::new);
 
@@ -229,25 +169,11 @@ public class WorkService {
         workRepository.save(addWork);
     }
 
-    /** 조퇴, 외출, 퇴근 메서드 */
-    public void putStatus(WorkStatus workStatus, Member member) {
-        Optional<Work> work = workRepository.findByDateWorkAndMember_Id(LocalDate.now(), member.getId());
-
-        if (work.isEmpty()) throw new CNoWorkDataException(); //출근 기록이 없습니다.
-        if (work.get().getWorkStatus().equals(WorkStatus.LEAVE_WORK)) throw new CAlreadyWorkOutDataException(); //퇴근후에는 상태를 변경할 수 없습니다.
-        if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException(); //근태상태를 다시 출근상태로 변경할 수 없습니다.
-        if (workStatus.equals(work.get().getWorkStatus())) throw new CNotChangeSameDataException(); //같은 근태 상태로는 다시 변경할 수 없습니다.
-
-        Work targetWork = work.get();
-        targetWork.putStatus(workStatus);
-        workRepository.save(targetWork);
-    }
-
 
     /** 관리자용 근무 리스트 가져오기 (+검색 기능)
      * 아무 조건도 선택하지 않으면 전체 리스트 가져옴 */
     public ListResult<WorkAdminListItem> getList(int pageNum, WorkSearchRequest workSearchRequest) {
-        PageRequest pageRequest = ListConvertService.getPageable(10);
+        PageRequest pageRequest = ListConvertService.getPageable(pageNum,10);
 
         Page<Work> works = getData(pageRequest, workSearchRequest); //페이징 된 원본 데이터 가져오기
 
@@ -325,4 +251,73 @@ public class WorkService {
 
         return countResult;
     }
+
+    //    private WorkTest putAttendance(WorkTest workTest, WorkStatus workStatus) {
+//        // 출근 후에는 다시 출근상태로 변경 할 수 없다.
+//        if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException();
+//
+//        // 같은 상태로는 변경 할 수 없다.
+//        if (workTest.getWorkStatus().equals(workStatus)) throw new CNotChangeSameDataException();
+//
+//        // 퇴근 후에는 상태를 변경 할 수 없다.
+//        if (workTest.getWorkStatus().equals(WorkStatus.LEAVE_WORK)) throw new CAlreadyWorkOutDataException();
+//
+//        workTest.putStatus(workStatus);
+//        return workTestRepository.save(workTest);
+//    }
+
+//    public WorkTestDetail getWorkTest(long memberId) {
+//        WorkTest workTest = workTestRepository.findById(memberId).orElseThrow(CMissingDataException::new);
+//        return new WorkTestDetail.WorkDetailBuilder(workTest).build();
+//    }
+
+//    public ListResult<WorkTestDetail> getWorkTests(long memberId, LocalDate dateStart, LocalDate dateEnd) {
+//        LocalDate startDate = LocalDate.of(dateStart.getYear(), dateStart.getMonthValue(), dateStart.getDayOfMonth());
+//        LocalDate endDate = LocalDate.of(dateEnd.getYear(), dateEnd.getMonthValue(), dateEnd.getDayOfMonth());
+//
+//        List<WorkTest> workTests = workTestRepository.findAllByDateWorkGreaterThanEqualAndDateWorkLessThanEqualOrderByIdDesc(startDate, endDate);
+//
+//        List<WorkTestDetail> result = new LinkedList<>();
+//        workTests.forEach(workTest -> {
+//            WorkTestDetail workTestDetail = new WorkTestDetail.WorkDetailBuilder(workTest).build();
+//            result.add(workTestDetail);
+//        });
+//
+//        return ListConvertService.settingResult(result);
+//    }
+
+//    public WorkStatusCountResponse getCountByWorkStatus() {
+//        WorkStatusCountResponse response = new WorkStatusCountResponse();
+//
+//        long countAttendance = workTestRepository.countByWorkStatus(WorkStatus.ATTENDANCE);
+//        long countEarlyLeave = workTestRepository.countByWorkStatus(WorkStatus.EARLY_LEAVE);
+//        long countNoStatus = workTestRepository.countByWorkStatus(WorkStatus.NO_STATUS);
+//
+//        response.setCountAttendance(countAttendance);
+//        response.setCountEarlyLeave(countEarlyLeave);
+//        response.setCountNoStatus(countNoStatus);
+//
+//        return response;
+//    }
+
+//    public long getCountByMyYearMonthTest(long memberId, int year, int month) {
+//        /*
+//        LocalDate dateToday = LocalDate.now();
+//        int todayYear = dateToday.getYear();
+//        int todayMonth = dateToday.getMonthValue();
+//        int todayDay = dateToday.getDayOfMonth();
+//        */
+//
+//        LocalDateTime dateStart = LocalDateTime.of(year, month, 1, 0, 0, 0);
+//
+//        Calendar cal = Calendar.getInstance();
+//        cal.set(year, month - 1, 1);
+//        int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+//        LocalDateTime dateEnd = LocalDateTime.of(year, month, maxDay, 23, 59, 59);
+//
+//        long countResult = workTestRepository.countByMemberIdAndDateCreateGreaterThanEqualAndDateCreateLessThanEqual(memberId, dateStart, dateEnd);
+//
+//        return countResult;
+//    }
+
 }
