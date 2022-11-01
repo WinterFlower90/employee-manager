@@ -30,11 +30,9 @@ public class HolidayHistory {
 
     /** 연차 갯수를 줄 수도 있기 때문에 증감 여부로 설계 */
     @ApiModelProperty(notes = "차감여부 (true 차감, false 증가)")
-    @Column(nullable = true)
     private Boolean isMinus;
 
     @ApiModelProperty(notes = "증감값")
-    @Column
     private Float increaseOrDecreaseValue;
 
     @Column(nullable = false)
@@ -53,17 +51,18 @@ public class HolidayHistory {
     @Column(nullable = false)
     private LocalDate dateDesired; //희망 일자
 
-    @Column(nullable = false)
+    @ApiModelProperty(notes = "연차 신청 일자")
     private LocalDate dateApplication; //신청 일자
 
+    @ApiModelProperty(notes = "연차 승인 여부 : 검토중 / 승인 / 반려")
     @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)
     private HolidayStatus holidayStatus; //승인 여부 - 검토중 / 승인 / 반려
 
-    @Column(nullable = false)
+    @ApiModelProperty(notes = "승인 시간")
     private LocalDateTime dateApproval; //승인 시간 (update 개념)
 
-    @Column(nullable = false)
+    @ApiModelProperty(notes = "반려 시간")
     private LocalDateTime dateRefusal; //반려 시간 (update 개념)
 
 
@@ -101,8 +100,9 @@ public class HolidayHistory {
         this.holidayType = builder.holidayType;
         this.reason = builder.reason;
         this.dateDesired = builder.dateDesired;
+        this.holidayStatus = builder.holidayStatus;
         this.dateCreate = builder.dateCreate;
-
+        this.dateUpdate = builder.dateUpdate;
     }
 
     public static class HolidayCreateBuilder implements CommonModelBuilder<HolidayHistory> {
@@ -110,14 +110,18 @@ public class HolidayHistory {
         private final HolidayType holidayType;
         private final String reason;
         private final LocalDate dateDesired;
+        private final HolidayStatus holidayStatus;
         private final LocalDateTime dateCreate;
+        private final LocalDateTime dateUpdate;
 
         public HolidayCreateBuilder(Member member, HolidayCreateRequest createRequest){
             this.member = member;
             this.holidayType = createRequest.getHolidayType();
             this.reason = createRequest.getReason();
             this.dateDesired = createRequest.getDateDesired();
+            this.holidayStatus = HolidayStatus.NO_STATUS;
             this.dateCreate = LocalDateTime.now();
+            this.dateUpdate = LocalDateTime.now();
         }
 
         @Override

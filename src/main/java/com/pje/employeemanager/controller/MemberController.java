@@ -31,7 +31,7 @@ public class MemberController {
     @PostMapping("/new")
     public CommonResult setMember(@RequestBody @Valid MemberJoinRequest joinRequest) {
         Member member = memberService.setMember(joinRequest); //회원 등록 후
-        holidayService.setHoliday(member.getId(), member.getDateJoin()); //연차 갯수 등록
+//        holidayService.setHoliday(member.getId(), member.getDateJoin()); //연차 갯수 등록
         return ResponseService.getSuccessResult();
     }
 

@@ -5,6 +5,7 @@ import com.pje.employeemanager.entity.Member;
 import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.model.CommonResult;
 import com.pje.employeemanager.model.ListResult;
+import com.pje.employeemanager.model.SingleResult;
 import com.pje.employeemanager.model.holiday.*;
 import com.pje.employeemanager.model.work.WorkAdminListItem;
 import com.pje.employeemanager.model.work.WorkDetail;
@@ -36,7 +37,7 @@ public class HolidayController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @PostMapping("/set/holiday/manager/{memberId}")
+    @PostMapping("/set/manager/{memberId}")
     public CommonResult setHolidayCount(@PathVariable long memberId, LocalDate dateJoin) {
         holidayService.setHoliday(memberId, dateJoin);
         return ResponseService.getSuccessResult();
@@ -49,33 +50,22 @@ public class HolidayController {
     })
     @PostMapping("/new/my/{memberId}")
     public CommonResult setHolidayCreate(@PathVariable long memberId, @RequestBody @Valid HolidayCreateRequest createRequest) {
-        Member member = memberService.getMemberData(memberId);
-        holidayService.setHolidayCreate(member, createRequest);
+        holidayService.setHolidayCreate(memberService.getMemberData(memberId), createRequest);
         return ResponseService.getSuccessResult();
     }
 
-    @ApiOperation(value = "휴가 신청 내역 리스트 가져오기")
-    @GetMapping("/holiday/search")
+    @ApiOperation(value = "전체 사원의 휴가 신청 내역 리스트 가져오기")
+    @GetMapping("/search")
     public ListResult<HolidayRegisterItem> getHolidayRegister() {
         return ResponseService.getListResult(holidayService.getHolidayRegister(), true);
     }
-
-//    /** 기간별 휴가 신청 내역 리스트 가져오기 */
-//    @ApiOperation(value = "기간별 휴가 신청 내역 리스트 가져오기")
-//    @GetMapping("/holiday/register/search")
-//    public ListResult<HolidayRegisterItem> getHolidayRegister(
-//            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateStart")LocalDate dateStart,
-//            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateEnd")LocalDate dateEnd
-//    ) {
-//        return ResponseService.getListResult(holidayService.getHolidayRegister(dateStart, dateEnd), true);
-//    }
 
     /** 휴가 승인 상태 변경하기 - 관리자용 */
     @ApiOperation(value = "휴가 승인 상태 변경하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "holidayHistoryId", value = "휴가 기록 시퀀스", required = true)
     })
-    @PutMapping("/holiday/register/manager/{holidayHistoryId}")
+    @PutMapping("/register/manager/{holidayHistoryId}")
     public CommonResult putHolidayStatus(@PathVariable long holidayHistoryId, @RequestBody @Valid HolidayStatusRequest holidayStatusRequest) {
         holidayService.putHolidayStatus(holidayHistoryId, holidayStatusRequest);
         return ResponseService.getSuccessResult();
@@ -93,7 +83,7 @@ public class HolidayController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
-    @PutMapping("/holiday/manager/{memberId}")
+    @PutMapping("/manager/{memberId}")
     public CommonResult putHolidayCount(@PathVariable long memberId, @RequestBody @Valid HolidayCountRequest holidayCountRequest) {
         Member member = memberService.getMemberData(memberId);
         holidayService.putHolidayCount(member, holidayCountRequest);
@@ -102,15 +92,53 @@ public class HolidayController {
 
     /** 관리자용 휴가 신청 리스트 가져오기 (필터기능 o) */
     @ApiOperation(value = "관리자용 휴가 신청 리스트 가져오기")
-    @PostMapping("/holiday/page/{pageNum}")
+    @PostMapping("/page/{pageNum}")
     public ListResult<HolidayAdminListItem> getHolidayListByAdmin(@PathVariable int pageNum, @RequestBody @Valid HolidaySearchRequest holidaySearchRequest) {
         return ResponseService.getListResult(holidayService.getList(pageNum, holidaySearchRequest), true);
     }
 
     /** 관리자용 기간별 or 특정 사원 휴가 신청 리스트 가져오기 */
     @ApiOperation(value = "관리자용 기간별 휴가 신청 리스트 가져오기")
-    @PostMapping("/holiday/period/page/{pageNum}")
+    @PostMapping("/period/page/{pageNum}")
     public ListResult<HolidayAdminListItem> getHolidayListByAdmin(@PathVariable int pageNum, @RequestBody @Valid HolidayListSearchRequest request) {
         return ResponseService.getListResult(holidayService.getListByAdmin(pageNum, request), true);
     }
+
+    @ApiOperation(value = "연차 초기값 등록하기")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true),
+            @ApiImplicitParam(name = "dateCriteria", value = "조회 기준일", required = true),
+    })
+    @PostMapping("/create/member-id/{memberId}")
+    public CommonResult setDefaultCount(
+            @PathVariable long memberId,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateCriteria")LocalDate dateCriteria) {
+        holidayService.setDefaultCount(memberService.getMemberData(memberId), dateCriteria);
+        return ResponseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "연차 갯수 정보 조회하기")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true),
+            @ApiImplicitParam(name = "dateCriteria", value = "조회 기준일", required = true)
+    })
+    @GetMapping("/count/search/member-id/{memberId}")
+    public SingleResult<MyHolidayCountResponse> getMyCount(
+            @PathVariable long memberId,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateCriteria")LocalDate dateCriteria) {
+        return ResponseService.getSingleResult(holidayService.getMyCount(memberService.getMemberData(memberId), dateCriteria));
+    }
+
+
+
+    //    /** 기간별 휴가 신청 내역 리스트 가져오기 */
+//    @ApiOperation(value = "기간별 휴가 신청 내역 리스트 가져오기")
+//    @GetMapping("/holiday/register/search")
+//    public ListResult<HolidayRegisterItem> getHolidayRegister(
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateStart")LocalDate dateStart,
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(value = "dateEnd")LocalDate dateEnd
+//    ) {
+//        return ResponseService.getListResult(holidayService.getHolidayRegister(dateStart, dateEnd), true);
+//    }
+
 }

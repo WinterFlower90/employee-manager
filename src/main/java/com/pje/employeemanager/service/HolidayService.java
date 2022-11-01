@@ -1,9 +1,6 @@
 package com.pje.employeemanager.service;
 
-import com.pje.employeemanager.entity.HolidayCount;
-import com.pje.employeemanager.entity.HolidayHistory;
-import com.pje.employeemanager.entity.Member;
-import com.pje.employeemanager.entity.Work;
+import com.pje.employeemanager.entity.*;
 import com.pje.employeemanager.enums.HolidayStatus;
 import com.pje.employeemanager.enums.HolidayType;
 import com.pje.employeemanager.exception.CAlreadyHolidayStatusDataException;
@@ -17,6 +14,8 @@ import com.pje.employeemanager.model.work.WorkAdminListItem;
 import com.pje.employeemanager.model.work.WorkSearchRequest;
 import com.pje.employeemanager.repository.HolidayCountRepository;
 import com.pje.employeemanager.repository.HolidayHistoryRepository;
+import com.pje.employeemanager.repository.TestHolidayCountRepository;
+import com.pje.employeemanager.repository.TestHolidayRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -36,6 +35,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +43,84 @@ public class HolidayService {
     private final HolidayCountRepository holidayCountRepository;
     private final HolidayHistoryRepository holidayHistoryRepository;
 
+    private final TestHolidayRepository testHolidayRepository;
+    private final TestHolidayCountRepository testHolidayCountRepository;
+
     @PersistenceContext
     EntityManager entityManager;
+
+    /**
+     * 연차 초기값 등록하기
+     * @param member - 사원 정보 가져오기. memberId
+     * @param dateCriteria - 임의의 연차 시작일 지정
+     * member에 초기값을 세팅하고 저장하기
+     */
+    public void setDefaultCount(Member member, LocalDate dateCriteria) {
+        // 기준일을 가지고 임의의 연차시작일을 만든다.
+        LocalDate dateStart = getCriteriaDateStart(member, dateCriteria);
+
+        // 연차시작일 <= 조회 기준일 and 연차종료일 >= 조회기준일 and 해당회원 조건에 해당하는 데이터를 가져온다.
+        Optional<TestHolidayCount> holidayCountCheck = testHolidayCountRepository.findByDateStartLessThanEqualAndDateEndGreaterThanEqualAndMember(dateCriteria, dateCriteria, member);
+
+        if (holidayCountCheck.isEmpty()) {
+            // 빌더를 통해 초기값 세팅
+            TestHolidayCount holidayCount = new TestHolidayCount.TestHolidayCountBuilder(member, dateStart).build();
+
+            // DB 저장
+            testHolidayCountRepository.save(holidayCount);
+        }
+    }
+
+    // 연차 개수 정보
+
+    /**
+     *
+     * @param member
+     * @param dateCriteria
+     * @return
+     */
+    public MyHolidayCountResponse getMyCount(Member member, LocalDate dateCriteria) {
+        // 연차시작일 <= 조회 기준일 and 연차종료일 >= 조회기준일 and 해당회원 조건에 해당하는 데이터를 가져온다.
+        Optional<TestHolidayCount> holidayCount = testHolidayCountRepository.findByDateStartLessThanEqualAndDateEndGreaterThanEqualAndMember(dateCriteria, dateCriteria, member);
+
+        // 만약에 데이터가 있으면 (등록된 연차 초기화 데이터가 있으면)
+        if (holidayCount.isPresent()) {
+            // 데이터에서 기준 시작일 가져오고
+            LocalDate dateStart = holidayCount.get().getDateStart();
+
+            // 데이터에서 기준 종료일 가져오고
+            LocalDate dateEnd = holidayCount.get().getDateEnd();
+
+            // 위의 기간에 연차 신청/승인 된 수 가져오고
+            long countComplete = testHolidayRepository.countByMemberAndDateHolidayRequestGreaterThanEqualAndDateHolidayRequestLessThanEqualAndIsComplete(member, dateStart, dateEnd, true);
+
+            // 빌더로 값을 넣고 리턴. (기본빌더)
+            return new MyHolidayCountResponse.MyHolidayCountResponseBuilder(holidayCount.get(), countComplete).build();
+        } else { // 등록된 연차 초기화 데이터가 없으면
+            // 임의로 연차 시작일을 구하고
+            LocalDate dateStart = getCriteriaDateStart(member, dateCriteria);
+            // 연차 시작일에서 1년을 더하고 1일을 빼고
+            LocalDate dateEnd = dateStart.plusYears(1).minusDays(1);
+
+            // 임의로 구한 기간에 연차 신청/승인된 수를 가져오고
+            long countComplete = testHolidayRepository.countByMemberAndDateHolidayRequestGreaterThanEqualAndDateHolidayRequestLessThanEqualAndIsComplete(member, dateStart, dateEnd, true);
+
+            // 빌더로 값을 넣고 리턴. 위의 빌더와 다른 것 주의.
+            return new MyHolidayCountResponse.MyHolidayCountResponseEmptyBuilder(dateStart, dateEnd, countComplete).build();
+        }
+    }
+
+    // 등록된 초기연차가 없을 때 기준일을 기준으로 연차 시작일을 구하는 메서드
+    private LocalDate getCriteriaDateStart(Member member, LocalDate dateCriteria) {
+        // 기준일의 년도를 가지고 몇년차인지 구한다.
+        // +1의 이유는 예를들면 2020년부터 2022년 근무라고 했을때 2020, 2021, 2022 총 3개를 세야하니까.
+        int perYear = dateCriteria.getYear() - member.getDateJoin().getYear() + 1;
+
+        // 입사일 기준으로 년차에 해당하는 연차 기준 시작일을 만들어 리턴한다.
+        return LocalDate.of(member.getDateJoin().getYear() + (perYear - 1), member.getDateJoin().getMonthValue(), member.getDateJoin().getDayOfMonth());
+    }
+
+
 
     /** 연차 등록 - 관리자용 */
     public void setHoliday(long memberId, LocalDate dateJoin) {
@@ -108,6 +184,28 @@ public class HolidayService {
             result.add(addItem);
         });
         return ListConvertService.settingResult(result);
+    }
+
+    /**
+     * 사원의 연차를 관리자가 승인상태로 만들기
+     * @param memberId : 사원 시퀀스
+     * @param holidayStatus : 휴가 처리 상태 - 검토중 / 승인 / 반려
+     */
+    public void putHolidayApproval(long memberId, HolidayStatus holidayStatus) {
+        HolidayHistory holidayHistory = holidayHistoryRepository.findById(memberId).orElseThrow(CMissingDataException::new);
+        holidayHistory.putHolidayApproval(holidayStatus);
+        holidayHistoryRepository.save(holidayHistory);
+    }
+
+    /**
+     * 사원의 연차를 관리자가 반려상태로 만들기
+     * @param memberId : 사원 시퀀스
+     * @param holidayStatus : 휴가 처리 상태 - 검토중 / 승인 / 반려
+     */
+    public void putHolidayRefusal(long memberId, HolidayStatus holidayStatus) {
+        HolidayHistory holidayHistory = holidayHistoryRepository.findById(memberId).orElseThrow(CMissingDataException::new);
+        holidayHistory.putHolidayRefusal(holidayStatus);
+        holidayHistoryRepository.save(holidayHistory);
     }
 
     /** U : 휴가 승인상태 변경하기 - 관리자 가능
