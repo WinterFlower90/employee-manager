@@ -8,6 +8,7 @@ import com.pje.employeemanager.model.member.MemberDepartmentRequest;
 import com.pje.employeemanager.model.member.MemberJoinRequest;
 import com.pje.employeemanager.model.member.MemberPasswordRequest;
 import com.pje.employeemanager.model.member.MemberPersonalInformationRequest;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,54 +25,70 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ApiModelProperty(notes = "관리자 여부")
     @Column(nullable = false)
     private Boolean isManager; //관리자 여부
 
+    @ApiModelProperty(notes = "사원 번호")
     @Column(nullable = false, length = 10)
     private String employeeNumber; //사원번호
 
+    @ApiModelProperty(notes = "사원 이름")
     @Column(nullable = false, length = 20)
     private String name; //이름
 
+    @ApiModelProperty(notes = "사원 연락처")
     @Column(nullable = false, length = 15)
     private String phone; //연락처
 
+    @ApiModelProperty(notes = "사원 생년월일")
     @Column(nullable = false)
     private LocalDate birthday; //생년월일
 
+    @ApiModelProperty(notes = "사원 성별")
     @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)
     private Gender gender; //성별
 
+    @ApiModelProperty(notes = "부서")
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
     private Department department; //부서
 
+    @ApiModelProperty(notes = "직급")
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
     private Position position; //직급
 
+    @ApiModelProperty(notes = "프로필사진 url")
     @Column(nullable = true)
     private String profileImageUrl; //프로필 사진 url
 
+    @ApiModelProperty(notes = "입사일")
     @Column(nullable = false)
     private LocalDate dateJoin; //입사일
 
+    @ApiModelProperty(notes = "재직 여부")
     @Column(nullable = false)
     private Boolean isWorking; //재직 여부
 
+    @ApiModelProperty(notes = "퇴사일")
     @Column(nullable = true)
     private LocalDate dateRetire; //퇴사일
 
+    @ApiModelProperty(notes = "사용자 아이디")
     @Column(nullable = false, length = 20, unique = true)
     private String username; //사용자 아이디
 
+    @ApiModelProperty(notes = "사용자 비밀번호")
     @Column(nullable = false, length = 20)
     private String password; //사용자 비밀번호
 
+    @ApiModelProperty(notes = "등록 시간")
     @Column(nullable = false)
     private LocalDateTime dateCreate; //등록시간
 
+    @ApiModelProperty(notes = "수정 시간")
     @Column(nullable = false)
     private LocalDateTime dateUpdate; //수정시간
 

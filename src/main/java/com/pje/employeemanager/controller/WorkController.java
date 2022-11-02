@@ -61,20 +61,6 @@ public class WorkController {
     }
 
 
-
-    @ApiOperation(value = "나의 근태 상태 가져오기")
-    @GetMapping("/my/status/{memberId}")
-    public SingleResult<WorkStatusResponse> getMyStatus(@PathVariable long memberId) {
-        return ResponseService.getSingleResult(workService.getMyStatus(memberId));
-    }
-
-    @ApiOperation(value = "출근 처리하기")
-    @PostMapping("/company-in")
-    public CommonResult setStatusCompanyIn(Member member) {
-        workService.setStatusCompanyIn(member);
-        return ResponseService.getSuccessResult();
-    }
-
     @ApiOperation(value = "출근 시간 변경하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "workId", value = "근무 시퀀스", required = true)
@@ -100,6 +86,20 @@ public class WorkController {
         Member member = memberService.getMemberData(memberId);
         return ResponseService.getSingleResult(workService.getCountByMyYearMonth(member, year, month));
     }
+
+
+//    @ApiOperation(value = "나의 근태 상태 가져오기")
+//    @GetMapping("/my/status/{memberId}")
+//    public SingleResult<WorkStatusResponse> getMyStatus(@PathVariable long memberId) {
+//        return ResponseService.getSingleResult(workService.getMyStatus(memberId));
+//    }
+//
+//    @ApiOperation(value = "출근 처리하기")
+//    @PostMapping("/company-in")
+//    public CommonResult setStatusCompanyIn(Member member) {
+//        workService.setStatusCompanyIn(member);
+//        return ResponseService.getSuccessResult();
+//    }
 
 
 //    @ApiOperation(value = "근무 정보 가져오기(test)")

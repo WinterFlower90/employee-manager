@@ -4,6 +4,7 @@ import com.pje.employeemanager.enums.WorkStatus;
 import com.pje.employeemanager.interfaces.CommonModelBuilder;
 import com.pje.employeemanager.model.work.WorkStatusRequest;
 import com.pje.employeemanager.model.work.WorkTimeResetRequest;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,32 +22,41 @@ public class Work {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ApiModelProperty(notes = "사원 시퀀스 받아오기위해 join")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId", nullable = false)
     private Member member; //출근회원
 
+    @ApiModelProperty(notes = "근무 상태")
     @Column(nullable = false, length = 20)
     @Enumerated(value = EnumType.STRING)
     private WorkStatus workStatus; //상태
 
+    @ApiModelProperty(notes = "근무 일자")
     @Column(nullable = false)
     private LocalDate dateWork; //근무 일자
 
+    @ApiModelProperty(notes = "출근 시간")
     @Column(nullable = false)
     private LocalTime inWork; //출근 시간
 
-
+    @ApiModelProperty(notes = "외출 시간")
     private LocalTime pauseWork; //외출 시간
 
+    @ApiModelProperty(notes = "복귀 시간")
     private LocalTime returnWork; //복귀 시간
 
+    @ApiModelProperty(notes = "조퇴 시간")
     private LocalTime earlyLeaveWork; //조퇴 시간
 
+    @ApiModelProperty(notes = "퇴근 시간")
     private LocalTime outWork; //퇴근 시간
 
+    @ApiModelProperty(notes = "등록 시간")
     @Column(nullable = false)
     private LocalDateTime dateCreate; //등록 시간
 
+    @ApiModelProperty(notes = "수정 시간")
     @Column(nullable = false)
     private LocalDateTime dateUpdate; //수정 시간
 
@@ -56,18 +66,22 @@ public class Work {
 
         switch (workStatus) {
 //            case GOING_OUT :
+//                this.workStatus = WorkStatus.GOING_OUT;
 //                this.pauseWork = LocalTime.now();
 //                this.dateUpdate = LocalDateTime.now();
 //                break;
 //            case RETURN :
+//                this.workStatus = WorkStatus.RETURN;
 //                this.returnWork = LocalTime.now();
 //                this.dateUpdate = LocalDateTime.now();
 //                break;
             case EARLY_LEAVE :
+                this.workStatus = WorkStatus.EARLY_LEAVE;
                 this.earlyLeaveWork = LocalTime.now();
                 this.dateUpdate = LocalDateTime.now();
                 break;
             case LEAVE_WORK :
+                this.workStatus = WorkStatus.LEAVE_WORK;
                 this.outWork = LocalTime.now();
                 this.dateUpdate = LocalDateTime.now();
                 break;

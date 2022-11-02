@@ -72,16 +72,14 @@ public class WorkService {
 
     /** 조퇴, 외출, 퇴근 메서드 - API 확인 o */
     private Work putWork(Work work, WorkStatus workStatus) {
-        if (workStatus.equals(WorkStatus.NO_STATUS)) throw new CNoWorkDataException(); //출근 기록이 없습니다.
+        if (work.getWorkStatus().equals(WorkStatus.NO_STATUS)) throw new CNoWorkDataException(); //출근 기록이 없습니다.
         if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException(); //근태상태를 다시 출근상태로 변경할 수 없습니다.
-        if (workStatus.equals(WorkStatus.LEAVE_WORK) || workStatus.equals(WorkStatus.EARLY_LEAVE)) throw new CAlreadyWorkOutDataException(); //퇴근후에는 상태를 변경할 수 없습니다.
+        if (work.getWorkStatus().equals(WorkStatus.LEAVE_WORK) || work.getWorkStatus().equals(WorkStatus.EARLY_LEAVE)) throw new CAlreadyWorkOutDataException(); //퇴근후에는 상태를 변경할 수 없습니다.
         if (work.getWorkStatus().equals(workStatus)) throw new CNotChangeSameDataException(); //같은 근태 상태로는 다시 변경할 수 없습니다.
 
         work.putStatus(workStatus);
         return workRepository.save(work);
     }
-
-
 
     /** 출 퇴근 시간 변경하기 - 관리자 가능 */
     public void putWorkTime(long workId, Member member, WorkTimeResetRequest resetRequest) {

@@ -35,19 +35,24 @@ public class HolidayHistory {
     @ApiModelProperty(notes = "증감값")
     private Float increaseOrDecreaseValue;
 
+    @ApiModelProperty(notes = "등록 시간")
     @Column(nullable = false)
     private LocalDateTime dateCreate; //생성 일자
 
+    @ApiModelProperty(notes = "수정시간")
     @Column(nullable = false)
     private LocalDateTime dateUpdate; //수정 일자
 
+    @ApiModelProperty(notes = "연차 타입")
     @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)
     private HolidayType holidayType; //휴가 타입 : 연차, 반차, 병가 ...
 
+    @ApiModelProperty(notes = "연차 사유")
     @Column(nullable = false)
     private String reason; //사유
 
+    @ApiModelProperty(notes = "연차 희망 일자")
     @Column(nullable = false)
     private LocalDate dateDesired; //희망 일자
 
