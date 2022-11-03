@@ -27,7 +27,7 @@ public class MemberController {
     private final HolidayService holidayService;
 
     /** 사원 등록 - 관리자용 */
-    @ApiOperation(value = "사원 등록 및 연차 등록하기")
+    @ApiOperation(value = "관리자용 사원 등록 및 연차 등록하기")
     @PostMapping("/new")
     public CommonResult setMember(@RequestBody @Valid MemberJoinRequest joinRequest) {
         Member member = memberService.setMember(joinRequest); //회원 등록 후
@@ -54,13 +54,13 @@ public class MemberController {
     }
 
     /** 관리자 리스트 - 관리자만 가능 */
-    @ApiOperation(value = "관리자 리스트 가져오기")
+    @ApiOperation(value = "관리자용 관리자 리스트 가져오기")
     @GetMapping("/search/manager")
     public ListResult<MemberItem> getManagerMembers(Boolean isManager) {
         return ResponseService.getListResult(memberService.getManagerMembers(isManager), true);
     }
 
-    @ApiOperation(value = "사원 정보 가져오기")
+    @ApiOperation(value = "사원 정보(단수) 가져오기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
@@ -80,7 +80,7 @@ public class MemberController {
     }
 
     /** 사원 부서 및 직급 수정하기 - 관리자만 가능 */
-    @ApiOperation(value = "사원 부서 및 직급 수정하기")
+    @ApiOperation(value = "관리자용 사원 부서 및 직급 수정하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
@@ -101,7 +101,7 @@ public class MemberController {
     }
 
     /** 사원에게 관리자 권한 부여하기 - 관리자만 가능 */
-    @ApiOperation(value = "사원에게 관리자권한 부여하기")
+    @ApiOperation(value = "관리자용 사원에게 관리자권한 부여하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
@@ -112,7 +112,7 @@ public class MemberController {
     }
 
     /** 사원 퇴사처리 하기 - 관리자만 가능 */
-    @ApiOperation(value = "사원을 퇴사처리 하기")
+    @ApiOperation(value = "관리자용 사원을 퇴사처리 하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })

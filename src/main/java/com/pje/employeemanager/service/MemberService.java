@@ -40,7 +40,11 @@ public class MemberService {
     EntityManager entityManager;
 
     /** 로그인.
-     *  isManager true = 관리자 로그인, false = 사원 로그인 */
+     *
+     * @param isManager isManager true = 관리자 로그인, false = 사원 로그인
+     * @param loginRequest MemberLoginRequest 형식에 맞춰 입력받은 값을 받는다
+     * @return 로그인
+     */
     public MemberLoginResponse doLogin(Boolean isManager, MemberLoginRequest loginRequest) {
         Member member = memberRepository.findByUsernameAndIsManager(loginRequest.getUsername(), isManager).orElseThrow(CMissingDataException::new);
 
@@ -60,19 +64,29 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    /** 사원 시퀀스 id로 데이터 가져오기 */
+    /** 사원 시퀀스 id로 데이터 가져오기
+     *
+     * @param id 사원 시퀀스
+     * @return 사원 데이터 반환
+     */
     public Member getMemberData(long id) {
         return memberRepository.findById(id).orElseThrow(CMissingDataException::new);
     }
 
-    /** 사원 정보 가져오기 */
+    /** 사원 정보 가져오기
+     * @param id 사원 시퀀스를 받는다
+     * @return 사원 정보 반환
+     */
     public MemberItem getMember(long id) {
         Member member = memberRepository.findById(id).orElseThrow(CMissingDataException::new);
         MemberItem result = new MemberItem.MemberItemBuilder(member).build();
         return result;
     }
 
-    /** 전체 직원 리스트 가져오기 (퇴사자 포함) */
+    /** 전체 직원 리스트 가져오기 (퇴사자 포함)
+     *
+     * @return 전체 직원 리스트 반환
+     */
     public ListResult<MemberItem> getMembers() {
         List<Member> members = memberRepository.findAll();
         List<MemberItem> result = new LinkedList<>();
@@ -84,7 +98,11 @@ public class MemberService {
         return ListConvertService.settingResult(result);
     }
 
-    /** 재직중인 직원 리스트 이름 오름차순으로 가져오기 */
+    /** 재직중인 직원 리스트 이름 오름차순으로 가져오기
+     *
+     * @param isWorking 근무여부 Boolean 값 받는다
+     * @return 재직중 or 퇴사자 직원 리스트 반환
+     */
     public ListResult<MemberItem> getMembers(Boolean isWorking) {
         List<Member> members = memberRepository.findAllByIsWorkingOrderByNameAsc(isWorking);
         List<MemberItem> result = new LinkedList<>();
@@ -96,7 +114,11 @@ public class MemberService {
         return ListConvertService.settingResult(result);
     }
 
-    /** 부서별 직원 리스트 이름 오름차순으로 가져오기 */
+    /** 부서별 직원 리스트 이름 오름차순으로 가져오기
+     *
+     * @param department 근무 부서 값 받는다
+     * @return 근무 부서별 직원 리스트 반환
+     */
     public ListResult<MemberItem> getMembers(Department department) {
         List<Member> members = memberRepository.findAllByDepartmentOrderByNameAsc(department);
         List<MemberItem> result = new LinkedList<>();
@@ -108,7 +130,11 @@ public class MemberService {
         return ListConvertService.settingResult(result);
     }
 
-    /** 관리자 직원 리스트 가져오기 */
+    /** 관리자 직원 리스트 가져오기
+     *
+     * @param isManager 관리자 여부 Boolean 값 받는다
+     * @return 관리자 or 비 관리자 직원 리스트 반환
+     */
     public ListResult<MemberItem> getManagerMembers(Boolean isManager) {
         List<Member> members = memberRepository.findAllByIsManagerOrderByIdDesc(isManager);
         List<MemberItem> result = new LinkedList<>();
@@ -120,35 +146,53 @@ public class MemberService {
         return ListConvertService.settingResult(result);
     }
 
-    /** 사원 비밀번호 변경하기 */
+    /** 사원 비밀번호 변경하기
+     *
+     * @param id 사원 시퀀스를 받는다
+     * @param passwordRequest passwordRequest 항목값을 받는다
+     */
     public void putPassword(long id, MemberPasswordRequest passwordRequest) {
         Member member = memberRepository.findById(id).orElseThrow(CMissingDataException::new);
         member.putPassword(passwordRequest);
         memberRepository.save(member);
     }
 
-    /** 사원 부서 및 직급 변경하기 */
+    /** 사원 부서 및 직급 변경하기
+     *
+     * @param id 사원 시퀀스를 받는다
+     * @param departmentRequest MemberDepartmentRequest 항목값을 받는다
+     */
     public void putDepartment(long id, MemberDepartmentRequest departmentRequest) {
         Member member = memberRepository.findById(id).orElseThrow(CMissingDataException::new);
         member.putDepartment(departmentRequest);
         memberRepository.save(member);
     }
 
-    /** 사원 개인정보(이름/연락처/프로필사진) 변경하기 */
+    /** 사원 개인정보(이름/연락처/프로필사진) 변경하기
+     *
+     * @param id 사원 시퀀스를 받는다
+     * @param personalInformationRequest 개인정보변경 request 항목값을 받는다
+     */
     public void putPersonalInfo(long id, MemberPersonalInformationRequest personalInformationRequest) {
         Member member = memberRepository.findById(id).orElseThrow(CMissingDataException::new);
         member.putPersonalInfo(personalInformationRequest);
         memberRepository.save(member);
     }
 
-    /** 사원 -> 관리자로 권한 변경하기 */
+    /** 사원 -> 관리자로 권한 변경하기
+     *
+     * @param id 사원시퀀스를 받는다
+     */
     public void putManager(long id) {
         Member member = memberRepository.findById(id).orElseThrow(CMissingDataException::new);
         member.putManager();
         memberRepository.save(member);
     }
 
-    /** 퇴사 후 데이터 삭제된것처럼 보이게하기 - 실제로 데이터가 삭제되지는 않음 */
+    /** 퇴사 후 데이터 삭제된것처럼 보이게하기 - 실제로 데이터가 삭제되지는 않음
+     *
+     * @param id 사원시퀀스를 받는다
+     */
     public void putMemberRetire(long id) {
         Member member = memberRepository.findById(id).orElseThrow(CMissingDataException::new);
 
@@ -179,7 +223,7 @@ public class MemberService {
 
     /** 페이징 된 원본 데이터 가져오기 (+검색)
      * private 인 것에 주의. 클래스 안쪽에서만 호출되어야 한다.
-     * 페이징 - 사용자가 보는 단위를 작게 쪼갠것을 페이징처리 한다고 한다.
+     * 페이징 - 사용자가 보는 단위를 작게 쪼갠것
      * 페이징처리를 하지 않게 되면 : 한 페이지에 모든 데이터를 전부 뿌려서 로딩속도 저하. 서버 과부하.*/
     private Page<Member> getData(Pageable pageable, MemberSearchRequest searchRequest) {
         //Criteria = 기준. 조건

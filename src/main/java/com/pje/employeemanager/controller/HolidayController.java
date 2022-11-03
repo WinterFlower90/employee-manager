@@ -33,7 +33,7 @@ public class HolidayController {
     private final HolidayService holidayService;
 
     /** 연차 등록하기 - 관리자용 */
-    @ApiOperation(value = "연차 등록하기")
+    @ApiOperation(value = "관리자용 연차 등록하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
     })
@@ -54,14 +54,23 @@ public class HolidayController {
         return ResponseService.getSuccessResult();
     }
 
+    /** 전체 사원의 휴가 신청 내역 리스트 가져오기 - 사원용 */
     @ApiOperation(value = "전체 사원의 휴가 신청 내역 리스트 가져오기")
     @GetMapping("/search")
     public ListResult<HolidayRegisterItem> getHolidayRegister() {
         return ResponseService.getListResult(holidayService.getHolidayRegister(), true);
     }
 
-    /** 휴가 승인 상태 변경하기 - 관리자용 */
-    @ApiOperation(value = "휴가 승인 상태 변경하기")
+    /** 사원별 연차 사용현황 갯수 리스트 가져오기 - 사원용 */
+    @ApiOperation(value = "전체 사원의 연차 갯수 현황 리스트 가져오기")
+    @GetMapping("/member/count/all")
+    public ListResult<HolidayCountListItem> getHolidayCounts() {
+        return ResponseService.getListResult(holidayService.getHolidayCounts(), true);
+    }
+
+
+    /** 관리자용 휴가 승인 상태 변경하기 */
+    @ApiOperation(value = "관리자용 휴가 승인 상태 변경하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "holidayHistoryId", value = "휴가 기록 시퀀스", required = true)
     })
@@ -70,24 +79,6 @@ public class HolidayController {
         holidayService.putHolidayStatus(holidayHistoryId, holidayStatusRequest);
         return ResponseService.getSuccessResult();
 
-    }
-
-    @ApiOperation(value = "사원별 연차 사용현황 갯수 리스트 가져오기")
-    @GetMapping("/member/all")
-    public ListResult<HolidayCountListItem> getHolidayCounts() {
-        return ResponseService.getListResult(holidayService.getHolidayCounts(), true);
-    }
-
-    /** 사원 연차 갯수 변경하기(증감) - 관리자용 */
-    @ApiOperation(value = "사원 연차 갯수 변경하기")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
-    })
-    @PutMapping("/manager/{memberId}")
-    public CommonResult putHolidayCount(@PathVariable long memberId, @RequestBody @Valid HolidayCountRequest holidayCountRequest) {
-        Member member = memberService.getMemberData(memberId);
-        holidayService.putHolidayCount(member, holidayCountRequest);
-        return ResponseService.getSuccessResult();
     }
 
     /** 관리자용 휴가 신청 리스트 가져오기 (필터기능 o) */
@@ -104,7 +95,8 @@ public class HolidayController {
         return ResponseService.getListResult(holidayService.getListByAdmin(pageNum, request), true);
     }
 
-    @ApiOperation(value = "연차 초기값 등록하기")
+    /** 관리자용 사원의 연차 초기값 등록하기 */
+    @ApiOperation(value = "관리자용 연차 초기값 등록하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true),
             @ApiImplicitParam(name = "dateCriteria", value = "조회 기준일", required = true),
@@ -117,7 +109,8 @@ public class HolidayController {
         return ResponseService.getSuccessResult();
     }
 
-    @ApiOperation(value = "연차 갯수 정보 조회하기")
+    /** 관리자용 사원의 연차 갯수 정보 조회하기 */
+    @ApiOperation(value = "관리자용 연차 갯수 정보 조회하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true),
             @ApiImplicitParam(name = "dateCriteria", value = "조회 기준일", required = true)
@@ -142,3 +135,14 @@ public class HolidayController {
 //    }
 
 }
+//    /** 사원 연차 갯수 변경하기(증감) - 관리자용 */
+//    @ApiOperation(value = "사원 연차 갯수 변경하기")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "memberId", value = "사원 시퀀스", required = true)
+//    })
+//    @PutMapping("/manager/{memberId}")
+//    public CommonResult putHolidayCount(@PathVariable long memberId, @RequestBody @Valid HolidayCountRequest holidayCountRequest) {
+//        Member member = memberService.getMemberData(memberId);
+//        holidayService.putHolidayCount(member, holidayCountRequest);
+//        return ResponseService.getSuccessResult();
+//    }

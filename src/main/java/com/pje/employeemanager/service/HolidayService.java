@@ -71,13 +71,11 @@ public class HolidayService {
         }
     }
 
-    // 연차 개수 정보
-
-    /**
-     *
-     * @param member
-     * @param dateCriteria
-     * @return
+    /** 연차 갯수 정보 조회하
+     *기
+     * @param member - 사원 정보 가져오기. memberId
+     * @param dateCriteria - 조회 기준일 설정.
+     * @return 연차 초기화된 데이터 반환
      */
     public MyHolidayCountResponse getMyCount(Member member, LocalDate dateCriteria) {
         // 연차시작일 <= 조회 기준일 and 연차종료일 >= 조회기준일 and 해당회원 조건에 해당하는 데이터를 가져온다.
@@ -110,7 +108,12 @@ public class HolidayService {
         }
     }
 
-    // 등록된 초기연차가 없을 때 기준일을 기준으로 연차 시작일을 구하는 메서드
+    /** 등록된 초기연차가 없을 때 기준일을 기준으로 연차 시작일을 구하기
+     *
+     * @param member - 사원 정보 가져오기. memberId
+     * @param dateCriteria - 조회 기준일 설정.
+     * @return 입사일 기준의 연차시작일을 만들어 계산하고 반환.
+     */
     private LocalDate getCriteriaDateStart(Member member, LocalDate dateCriteria) {
         // 기준일의 년도를 가지고 몇년차인지 구한다.
         // +1의 이유는 예를들면 2020년부터 2022년 근무라고 했을때 2020, 2021, 2022 총 3개를 세야하니까.
@@ -122,13 +125,14 @@ public class HolidayService {
 
 
 
-    /** 연차 등록 - 관리자용 */
+    //todo : 연차 증감에 관해서 한번 더 검토해야함
+    /** 관리자용 연차 등록 */
     public void setHoliday(long memberId, LocalDate dateJoin) {
         HolidayCount holidayCount = new HolidayCount.HolidayCountBuilder(memberId, dateJoin).build();
         holidayCountRepository.save(holidayCount);
     }
 
-    /** 연차 증감 - 관리자용 */
+    /** 관리자용 연차 증감 */
     public void putHolidayCount(Member member, HolidayCountRequest holidayCountRequest) {
         HolidayCount holidayCount = holidayCountRepository.findById(member.getId()).orElseThrow(CMissingDataException::new);
 
@@ -142,7 +146,12 @@ public class HolidayService {
     }
 
 
-    /** C : 휴가 신청하기 - 사원용 */
+    /** C : 휴가 신청하기 - 사원용
+     *
+     * @param member 사원 정보 가져오기. memberId
+     * @param request HolidayRequest 항목 값을 입력받는다.
+     * 휴가내역에 저장한다.
+     */
     public void setHolidayCreate(Member member, HolidayCreateRequest request) {
         HolidayHistory holidayHistory = new HolidayHistory.HolidayCreateBuilder(member, request).build();
         holidayHistoryRepository.save(holidayHistory);
@@ -159,7 +168,7 @@ public class HolidayService {
         return ListConvertService.settingResult(result);
     }
 
-    /** R : 일자별 휴가 신청 리스트 가져오기 */
+//    /** R : 일자별 휴가 신청 리스트 가져오기 */
 //    public ListResult<HolidayRegisterItem> getHolidayRegister(LocalDate dateStart, LocalDate dateEnd) {
 //        LocalDate startDate = LocalDate.of(dateStart.getYear(), dateStart.getMonthValue(), dateStart.getDayOfMonth());
 //        LocalDate endDate = LocalDate.of(dateEnd.getYear(), dateEnd.getMonthValue(), dateEnd.getDayOfMonth());
@@ -174,7 +183,9 @@ public class HolidayService {
 //        return ListConvertService.settingResult(result);
 //    }
 
-    /** 사원별 연차 현황 리스트 가져오기 - 관리자용 */
+
+    //todo : 관리자용 기능 검토하기
+    /** 관리자용 사원별 연차 현황 리스트 가져오기 */
     public ListResult<HolidayCountListItem> getHolidayCounts() {
         List<HolidayCount> counts = holidayCountRepository.findAll();
         List<HolidayCountListItem> result = new LinkedList<>();
@@ -209,7 +220,12 @@ public class HolidayService {
     }
 
     /** U : 휴가 승인상태 변경하기 - 관리자 가능
-     * (exception 보완하기) */
+     *
+     * @param holidayHistoryId 휴가내역 시퀀스
+     * @param holidayStatusRequest 휴가 승인 상태 / 휴가 차감 값을 받는다.
+     *  사원의 휴가내역을 저장한다.
+     */
+    //todo: exception 보완하기
     public void putHolidayStatus(long holidayHistoryId, HolidayStatusRequest holidayStatusRequest) {
         HolidayHistory holidayHistory = holidayHistoryRepository.findById(holidayHistoryId).orElseThrow(CMissingDataException::new);
 
@@ -234,7 +250,13 @@ public class HolidayService {
     }
 
     /** 관리자용 휴가 리스트 가져오기 (+검색 기능)
-     * 아무 조건도 선택하지 않으면 전체 리스트 가져옴 */
+     * 아무 조건도 선택하지 않으면 전체 리스트 가져옴
+     *
+     * @param pageNum
+     * @param holidaySearchRequest
+     * 검색 필터 : 아이디 / 이름 / 휴가 타입 / 승인 여부 / 휴가 희망일자(검색시작일) - 휴가 희망일자(검색종료일) / 휴가 신청일자(검색시작일) - 휴가 신청일자(검색종료일)
+     * @return 리스트 반환
+     */
     public ListResult<HolidayAdminListItem> getList(int pageNum, HolidaySearchRequest holidaySearchRequest) {
         PageRequest pageRequest = ListConvertService.getPageable(10);
 
@@ -252,7 +274,13 @@ public class HolidayService {
         return result;
     }
 
-    /** 페이징 된 원본 데이터 가져오기 (+검색) */
+    /** 페이징 된 원본 데이터 가져오기 (+검색)
+     *
+     * @param pageable
+     * @param searchRequest
+     * 검색 필터 : 아이디 / 이름 / 휴가 타입 / 승인 여부 / 휴가 희망일자(검색시작일) - 휴가 희망일자(검색종료일) / 휴가 신청일자(검색시작일) - 휴가 신청일자(검색종료일)
+     * @return 페이징 된 원본 데이터를 조건이 있으면 조건에 맞춰 반환. 조건이 없으면 전체 리스트 반환.
+     */
     private Page<HolidayHistory> getData(Pageable pageable, HolidaySearchRequest searchRequest) {
         //Criteria = 기준. 조건
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder(); //조건을 넣을 수 있는 빌더 가져오기
@@ -294,7 +322,12 @@ public class HolidayService {
         return new PageImpl<>(query.getResultList(), pageable, totalRows); //페이징을 구현한 데이터를 반환함 (현재 선택된 페이지의 데이터들, 페이징 객체, 총 데이터 수)
     }
 
-    /** 휴가 신청 내역 가져오기 (관리자용) */
+    /** 관리자용 휴가 신청 내역 가져오기
+     *
+     * @param pageNum pageNum값을 받는다.
+     * @param searchRequest 검색 필터 : 사원 시퀀스 / 검색 시작일 / 검색 종료일
+     * @return 가공된 List-Result 반환
+     */
     public ListResult<HolidayAdminListItem> getListByAdmin(int pageNum, HolidayListSearchRequest searchRequest) {
         Page<HolidayHistory> originList;
         PageRequest pageRequest = PageRequest.of(pageNum, 10);

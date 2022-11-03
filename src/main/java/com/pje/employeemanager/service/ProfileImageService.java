@@ -21,13 +21,21 @@ import java.util.Optional;
 public class ProfileImageService {
     private final MemberProfileImageRepository memberProfileImageRepository;
 
-    // 등록된 이미지 가져오기
+    /** 등록된 이미지 가져오기
+     *
+     * @param memberId 사원 시퀀스를 받는다
+     * @return response 에서 받은 profileImage 를 가져온다
+     */
     public ProfileImageResponse getImage(long memberId) {
         MemberProfileImage profileImage = memberProfileImageRepository.findByMemberId(memberId).orElseThrow(CMissingDataException::new);
         return new ProfileImageResponse.ProfileImageResponseBuilder(profileImage).build();
     }
 
-    // 이미지 등록 메서드
+    /** 이미지 등록하기
+     *
+     * @param memberId 사원 시퀀스를 받는다
+     * @param file 사원이 변경할 프로필 사진을 받는다
+     */
     public void setImage(long memberId, MultipartFile file) {
         // 한 회원당 하나의 프로필사진만 등록 가능하게 하기 위해 optional 로 데이터를 가져옴.
         Optional<MemberProfileImage> profileImage = memberProfileImageRepository.findByMemberId(memberId);
@@ -51,14 +59,15 @@ public class ProfileImageService {
         }
     }
 
-    /*
-    MultipartFile 에서 File 자료형으로 변환하기 위한 메서드.
-    MultipartFile 형태를 가진 파일을 받아서 File (우리가 알고있는 파일이라고 부른 것들) 형태로 만들어 줌.
-    만듬과 동시에 C:/workspace/java/api-company-manager/src/main/resources/static/ 이 경로에 저장 함.
+    /** MultipartFile 에서 File 자료형으로 변환하기
+     *
+     * @param memberId 사원 시퀀스를 받는다
+     * @param file MultipartFile 형태를 가진 파일을 받는다
+     * @return 자료형을 변환하여 C:/workspace/java/employee-manager/src/main/resources/static/ 경로에 저장함
      */
     private File convertFile(long memberId, MultipartFile file) {
         // 저장될 경로
-        String path = "C:/workspace/java/api-company-manager/src/main/resources/static/";
+        String path = "C:/workspace/java/employee-manager/src/main/resources/static/";
 
         // 파일의 확장자
         String[] ext = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");

@@ -40,7 +40,11 @@ public class WorkService {
     @PersistenceContext
     EntityManager entityManager;
 
-    /** 현재 근무 상태 불러오기 - API 확인 o  */
+    /** 현재 근무 상태 불러오기
+     *
+     * @param member 사원을 받는다
+     * @return 사원의 근무 상태를 반환
+     */
     public WorkResponse getCurrentStatus(Member member) {
         Optional<Work> work = workRepository.findByDateWorkAndMember_Id(LocalDate.now(), member.getId());
 
@@ -48,7 +52,12 @@ public class WorkService {
         else return new WorkResponse.WorkResponseBuilder(work.get()).build();
     }
 
-    /** 근무 상태 수정하기 - API 확인 o  */
+    /** 근무 상태 수정하기
+     *
+     * @param member 사원을 받는다
+     * @param workStatus 근무상태를 받는다
+     * @return 수정한 근무상태를 반환
+     */
 
     public WorkResponse doWorkChange(Member member, WorkStatus workStatus) {
         Optional<Work> work = workRepository.findByDateWorkAndMember_Id(LocalDate.now(), member.getId());
@@ -60,17 +69,22 @@ public class WorkService {
         return new WorkResponse.WorkResponseBuilder(workResult).build();
     }
 
-
-    //
-
-
-    /** 근무 등록하기 - 매일 자동등록 - API 확인 o */
+    /** 근무 등록하기
+     *
+     * @param member 사원을 받는다
+     * @return 근무를 등록
+     */
     private Work setWork(Member member) {
         Work data = new Work.WorkBuilder(member).build();
         return workRepository.save(data);
     }
 
-    /** 조퇴, 외출, 퇴근 메서드 - API 확인 o */
+    /** 조퇴, 퇴근 메서드
+     *
+     * @param work 근무를 받는다
+     * @param workStatus 근무 상태를 받는다
+     * @return 출근 / 조퇴 / 퇴근 처리를 한다
+     */
     private Work putWork(Work work, WorkStatus workStatus) {
         if (work.getWorkStatus().equals(WorkStatus.NO_STATUS)) throw new CNoWorkDataException(); //출근 기록이 없습니다.
         if (workStatus.equals(WorkStatus.ATTENDANCE)) throw new CAlreadyWorkInDataException(); //근태상태를 다시 출근상태로 변경할 수 없습니다.
@@ -81,7 +95,12 @@ public class WorkService {
         return workRepository.save(work);
     }
 
-    /** 출 퇴근 시간 변경하기 - 관리자 가능 */
+    /** 출 퇴근 시간 변경하기 - 관리자 가능
+     *
+     * @param workId 근무 시퀀스를 받는다
+     * @param member 사원을 받는다
+     * @param resetRequest timeReset 항목값을 받는다
+     */
     public void putWorkTime(long workId, Member member, WorkTimeResetRequest resetRequest) {
         Work work = workRepository.findById(workId).orElseThrow(CMissingDataException::new);
         work.putWorkTime(member, resetRequest);
@@ -118,7 +137,12 @@ public class WorkService {
     }
 
 
-    /** 일자별 근무리스트 가져오기 */
+    /** 일자별 근무리스트 가져오기
+     *
+     * @param dateStart 검색 시작일을 받는다
+     * @param dateEnd 검색 종료일을 받는다
+     * @return 해당 리스트를 반환
+     */
     public ListResult<WorkDetail> getWorkDetails(LocalDate dateStart, LocalDate dateEnd) {
         LocalDate startDate = LocalDate.of(dateStart.getYear(), dateStart.getMonthValue(), dateStart.getDayOfMonth());
         LocalDate endDate = LocalDate.of(dateEnd.getYear(), dateEnd.getMonthValue(), dateEnd.getDayOfMonth());
@@ -133,7 +157,11 @@ public class WorkService {
         return ListConvertService.settingResult(result);
     }
 
-    /** 근무자별 근무리스트 가져오기 - API 확인 o  */
+    /** 근무자별 근무리스트 가져오기
+     *
+     * @param memberId 사원 시퀀스를 받는다
+     * @return 해당 리스트를 반환
+     */
     public ListResult<WorkDetail> getMemberWorkDetails(long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(CMissingDataException::new);
 
@@ -147,14 +175,21 @@ public class WorkService {
     }
 
     /** 나의 현재 근태상태 가져오기.
+     *
+     * @param memberId 사원 시퀀스를 받는다
+     * @return
      * 기준일과 회원시퀀스가 일치하는 데이터를 가져옴.
-     * 만약 없다면 상태없음으로 세팅 */
+     * 만약 없다면 상태없음으로 세팅
+     */
     public WorkStatusResponse getMyStatus(long memberId) {
         Work work = workRepository.findByDateWorkAndMember_Id(LocalDate.now(), memberId).orElse(new Work.WorkNoneValueBuilder().build());
         return new WorkStatusResponse.WorkStatusResponseBuilder(work).build();
     }
 
-    /** 출근 처리 메서드 */
+    /** 출근 처리 메서드
+     *
+     * @param member 사원을 받는다
+     */
     public void setStatusCompanyIn(Member member) {
         //상태 조회를 위한 jpa - findByDateWorkAndMember_Id 메서드 재사용
         //"오늘", "이 회원" 의 근태 상태 데이터를 가져다줘 라는 명령이 반복
@@ -168,6 +203,7 @@ public class WorkService {
     }
 
 
+    //todo : 로직 검토
     /** 관리자용 근무 리스트 가져오기 (+검색 기능)
      * 아무 조건도 선택하지 않으면 전체 리스트 가져옴 */
     public ListResult<WorkAdminListItem> getList(int pageNum, WorkSearchRequest workSearchRequest) {
@@ -229,6 +265,7 @@ public class WorkService {
         return new PageImpl<>(query.getResultList(), pageable, totalRows); //페이징을 구현한 데이터를 반환함 (현재 선택된 페이지의 데이터들, 페이징 객체, 총 데이터 수)
     }
 
+    //todo : 로직 검토
     /** 특정 사원의 특정 년/월 근무일수 구하기 */
     public long getCountByMyYearMonth(Member member, int year, int month) {
         /*
