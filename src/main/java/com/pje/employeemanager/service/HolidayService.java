@@ -71,8 +71,8 @@ public class HolidayService {
         }
     }
 
-    /** 연차 갯수 정보 조회하
-     *기
+    /** 연차 갯수 정보 조회하기
+     *
      * @param member - 사원 정보 가져오기. memberId
      * @param dateCriteria - 조회 기준일 설정.
      * @return 연차 초기화된 데이터 반환
